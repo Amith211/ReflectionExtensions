@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29001.49
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{8D6A2323-DD39-4512-A13A-3F740AE5FA93}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{B37CA121-7D47-44AD-AFB7-686D10C16435}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LCattell.ReflectionExtensions", "src\LCattell.ReflectionExtensions\LCattell.ReflectionExtensions.csproj", "{02D54398-7F60-442C-80C5-D6A715728D94}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LCattell.ReflectionExtensions.Tests", "tests\LCattell.ReflectionExtensions.Tests\LCattell.ReflectionExtensions.Tests.csproj", "{9BDD42A7-B45A-4E8E-B473-EDBF145AAE83}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{40D8C50E-5D89-4CFC-8B5A-5742AAEA2230}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		src\stylecop.json = src\stylecop.json
+		src\stylecop.ruleset = src\stylecop.ruleset
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{02D54398-7F60-442C-80C5-D6A715728D94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02D54398-7F60-442C-80C5-D6A715728D94}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02D54398-7F60-442C-80C5-D6A715728D94}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02D54398-7F60-442C-80C5-D6A715728D94}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9BDD42A7-B45A-4E8E-B473-EDBF145AAE83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9BDD42A7-B45A-4E8E-B473-EDBF145AAE83}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9BDD42A7-B45A-4E8E-B473-EDBF145AAE83}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9BDD42A7-B45A-4E8E-B473-EDBF145AAE83}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{02D54398-7F60-442C-80C5-D6A715728D94} = {8D6A2323-DD39-4512-A13A-3F740AE5FA93}
+		{9BDD42A7-B45A-4E8E-B473-EDBF145AAE83} = {B37CA121-7D47-44AD-AFB7-686D10C16435}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A02CA270-A7AB-4F86-98BD-18146D3A5103}
+	EndGlobalSection
+EndGlobal
