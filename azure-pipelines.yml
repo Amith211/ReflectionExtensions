@@ -21,25 +21,38 @@ stages:
     steps:
     - task: NuGetToolInstaller@0
 
-    - task: NuGetCommand@2
-      inputs:
-        restoreSolution: '$(solution)'
+#    - task: NuGetCommand@2
+#      inputs:
+#        restoreSolution: '$(solution)'
 
-    - task: VSBuild@1
+    - task: DotNetCoreCLI@2
       inputs:
-        solution: '$(solution)'
-        #msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(build.artifactStagingDirectory)\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
-        msbuildArgs: '/t:restore;build'
-        platform: '$(buildPlatform)'
+        command: 'restore'
+        feedsToUse: 'select'
+
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: 'build'
         configuration: '$(buildConfiguration)'
+        arguments: 
+          solution: '$(solution)'
+        
+        
+#    - task: VSBuild@1
+#      inputs:
+#        solution: '$(solution)'
+#        #msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(build.artifactStagingDirectory)\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
+#        msbuildArgs: '/t:restore;build'
+#        platform: '$(buildPlatform)'
+#        configuration: '$(buildConfiguration)'
 
-    - task: CopyFiles@2
-      inputs:
-        SourceFolder: '$(Build.SourcesDirectory)'
-        Contents: '**/bin/**'
-        TargetFolder: '$(build.artifactstagingdirectory)\pipelinestest'
+#    - task: CopyFiles@2
+#      inputs:
+#        SourceFolder: '$(Build.SourcesDirectory)'
+#        Contents: '**/bin/**'
+#        TargetFolder: '$(build.artifactstagingdirectory)\pipelinestest'
         #flattenFolders: true
-        OverWrite: true
+#        OverWrite: true
 
     - task: PublishPipelineArtifact@0
       displayName: 'Publish Artifact drop'
@@ -79,6 +92,7 @@ stages:
     - task: DotNetCoreCLI@2
       inputs:
         command: 'test'
+        nobuild: true
         publishTestResults: true
 
 #    - task: VSTest@2
