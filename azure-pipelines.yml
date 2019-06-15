@@ -21,7 +21,7 @@ stages:
     steps:
     - task: DotNetCoreInstaller@0
       inputs:
-        version: '2.2'
+        version: '2.2.*'
 
     #- task: NuGetToolInstaller@0
 
