@@ -81,6 +81,7 @@ stages:
       inputs:
         platform: '$(buildPlatform)'
         configuration: '$(buildConfiguration)'
+        searchFolder: '$(build.artifactstagingdirectory)'
         testAssemblyVer2: | 
             **\$(buildConfiguration)\**\*tests*.dll
             !**\*TestAdapter.dll
