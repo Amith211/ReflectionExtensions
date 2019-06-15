@@ -40,24 +40,24 @@ stages:
         TargetFolder: '$(build.artifactstagingdirectory)'
         OverWrite: true
 
+#    - task: PublishPipelineArtifact@0
+#      displayName: 'Publish Artifact drop'
+#      inputs:
+#        artifactName: 'drop'
+#        targetPath: '$(Build.SourcesDirectory)'
+
+
     - task: PublishPipelineArtifact@0
       displayName: 'Publish Artifact drop'
       inputs:
-        artifactName: 'drop'
-        targetPath: '$(Build.SourcesDirectory)'
-
-
-#    - task: PublishPipelineArtifact@0
-#      displayName: 'Publish Artifact drop'
-#      inputs:
-#        artifactName: '.netstandard2.0'
-#        targetPath: '$(build.artifactstagingdirectory)/netstandard2.0'
+        artifactName: '.netstandard2.0'
+        targetPath: '$(build.artifactstagingdirectory)/netstandard2.0'
     
-#    - task: PublishPipelineArtifact@0
-#      displayName: 'Publish Artifact drop'
-#      inputs:
-#        artifactName: '.netcore2.2'
-#        targetPath: '$(build.artifactstagingdirectory)/netcoreapp2.2'
+    - task: PublishPipelineArtifact@0
+      displayName: 'Publish Artifact drop'
+      inputs:
+        artifactName: '.netcore2.2'
+        targetPath: '$(build.artifactstagingdirectory)/netcoreapp2.2'
         
 
       
