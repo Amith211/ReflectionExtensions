@@ -89,7 +89,7 @@ stages:
 
       
 
-- stage: test
+- stage: Test
   jobs:
   - job: Test
     displayName: 'Run Tests'
