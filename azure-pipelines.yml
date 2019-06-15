@@ -33,6 +33,35 @@ stages:
         platform: '$(buildPlatform)'
         configuration: '$(buildConfiguration)'
 
+    - task: CopyFiles@2
+      inputs:
+        SourceFolder: '$(Build.SourcesDirectory)'
+        Contents: '**/bin/**'
+        TargetFolder: '$(build.artifactstagingdirectory)'
+        OverWrite: true
+
+    - task: PublishPipelineArtifact@0
+      displayName: 'Publish Artifact drop'
+      inputs:
+        artifactName: 'drop'
+        targetPath: '$(build.artifactstagingdirectory)'
+
+
+#    - task: PublishPipelineArtifact@0
+#      displayName: 'Publish Artifact drop'
+#      inputs:
+#        artifactName: '.netstandard2.0'
+#        targetPath: '$(build.artifactstagingdirectory)/netstandard2.0'
+    
+#    - task: PublishPipelineArtifact@0
+#      displayName: 'Publish Artifact drop'
+#      inputs:
+#        artifactName: '.netcore2.2'
+#        targetPath: '$(build.artifactstagingdirectory)/netcoreapp2.2'
+        
+
+      
+
 - stage: test
   jobs:
   - job: test
@@ -40,9 +69,20 @@ stages:
     pool:
       vmImage: 'windows-latest'
     steps:
+    - task: DownloadPipelineArtifact@1
+      inputs:
+        artifactName: 'drop'
+        #artifactName: '.netcore2.2'
+
     - task: VSTest@2
       displayName: 'Run Unit Tests'
       inputs:
         platform: '$(buildPlatform)'
         configuration: '$(buildConfiguration)'
+        testAssemblyVer2: | 
+            **\$(buildConfiguration)\*\*tests*.dll
+            !**\*TestAdapter.dll
+            !**\obj\**
+        
         codeCoverageEnabled: true
+##otherConsoleOptions: '/Framework:".NETCoreApp,Version=v2.2"'
