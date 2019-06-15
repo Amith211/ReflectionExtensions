@@ -37,6 +37,8 @@ stages:
   jobs:
   - job: test
     displayName: 'Run Tests'
+    pool:
+      vmImage: 'windows-latest'
     steps:
     - task: VSTest@2
       displayName: 'Run Unit Tests'
