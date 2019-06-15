@@ -76,15 +76,20 @@ stages:
         artifactName: 'drop'
         #artifactName: '.netcore2.2'
 
-    - task: VSTest@2
-      displayName: 'Run Unit Tests'
+    - task: DotNetCoreCLI@2
       inputs:
-        platform: '$(buildPlatform)'
-        configuration: '$(buildConfiguration)'
-        searchFolder: '$(build.artifactstagingdirectory)'
-        testAssemblyVer2: | 
-            **\$(buildConfiguration)\**\*tests*.dll
-            !**\*TestAdapter.dll
-            !**\obj\**
-        otherConsoleOptions: '/Framework:".NETCoreApp,Version=v2.2"'
-        codeCoverageEnabled: true
+        command: 'test'
+        publishTestResults: true
+
+#    - task: VSTest@2
+#      displayName: 'Run Unit Tests'
+#      inputs:
+#        platform: '$(buildPlatform)'
+#        configuration: '$(buildConfiguration)'
+#        searchFolder: '$(build.artifactstagingdirectory)'
+#        testAssemblyVer2: | 
+#            **\$(buildConfiguration)\**\*tests*.dll
+#            !**\*TestAdapter.dll
+#            !**\obj\**
+#        otherConsoleOptions: '/Framework:".NETCoreApp,Version=v2.2"'
+#        codeCoverageEnabled: true
