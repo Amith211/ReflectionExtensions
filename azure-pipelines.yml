@@ -86,6 +86,5 @@ stages:
             **\$(buildConfiguration)\**\*tests*.dll
             !**\*TestAdapter.dll
             !**\obj\**
-        
+        otherConsoleOptions: '/Framework:".NETCoreApp,Version=v2.2"'
         codeCoverageEnabled: true
-##otherConsoleOptions: '/Framework:".NETCoreApp,Version=v2.2"'
