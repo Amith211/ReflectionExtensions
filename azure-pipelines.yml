@@ -89,9 +89,9 @@ stages:
 
       
 
-- stage: Test
+- stage: Testt
   jobs:
-  - job: Test
+  - job: Testt
     displayName: 'Run Tests'
     pool:
       vmImage: 'windows-latest'
@@ -105,8 +105,9 @@ stages:
       displayName: Test
       inputs:
         command: 'test'
-        projects: '**/*Test*/*.csproj'
-        arguments: '--configuration $(buildConfiguration) --collect "Code coverage"'
+        #projects: '**/*Test*/*.csproj'
+        #arguments: '--configuration $(buildConfiguration) --collect "Code coverage"'
+        arguments: '--logger trx --collect "Code coverage"'
         nobuild: true
         #publishTestResults: true
 
