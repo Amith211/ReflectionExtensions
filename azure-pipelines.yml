@@ -19,7 +19,11 @@ stages:
     pool:
       vmImage: 'windows-latest'
     steps:
-    - task: NuGetToolInstaller@0
+    - task: DotNetCoreInstaller@0
+      inputs:
+        version: '2.2'
+
+    #- task: NuGetToolInstaller@0
 
 #    - task: NuGetCommand@2
 #      inputs:
@@ -28,14 +32,16 @@ stages:
     - task: DotNetCoreCLI@2
       inputs:
         command: 'restore'
+        projects: '**/*.csproj'
         feedsToUse: 'select'
 
     - task: DotNetCoreCLI@2
       inputs:
         command: 'build'
+        projects: '**/*.csproj'
         configuration: '$(buildConfiguration)'
         arguments: 
-          solution: '$(solution)'
+          solution'$(solution)'
         
         
 #    - task: VSBuild@1
@@ -92,6 +98,8 @@ stages:
     - task: DotNetCoreCLI@2
       inputs:
         command: 'test'
+        projects: '**/*Test*/*.csproj'
+        arguments: '--configuration $(buildConfiguration) --collect "Code coverage"'
         nobuild: true
         publishTestResults: true
 
