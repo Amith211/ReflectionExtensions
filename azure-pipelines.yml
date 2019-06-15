@@ -31,19 +31,23 @@ stages:
 
     - task: DotNetCoreCLI@2
       displayName: 'Restore'
-      inputs:
-        command: 'restore'
-        #projects: '**/*.csproj'
-        feedsToUse: 'select'
+    #  inputs:
+    #    command: 'restore'
+    #    #projects: '**/*.csproj'
+    #    feedsToUse: 'select'
+      
+      #script: dotnet restore
 
     - task: DotNetCoreCLI@2
       displayName: 'Build'
       inputs:
         command: 'build'
         #projects: '**/*.csproj'
-        configuration: '$(buildConfiguration)'
-        arguments: 
-          solution'$(solution)'
+        #configuration: '$(buildConfiguration)'
+        #arguments:
+          #po
+          #sol
+          #solution'$(solution)'
         
         
 #    - task: VSBuild@1
