@@ -23,11 +23,7 @@ stages:
       inputs:
         version: '2.2.300'
 
-    #- task: NuGetToolInstaller@0
-
-#    - task: NuGetCommand@2
-#      inputs:
-#        restoreSolution: '$(solution)'
+    #- task: NuGetToolInstaller@0 # Doesn't require exact Version live above task
 
     - task: DotNetCoreCLI@2
       displayName: 'Restore'
@@ -42,21 +38,6 @@ stages:
       displayName: 'Build'
       inputs:
         command: 'build'
-        #projects: '**/*.csproj'
-        #configuration: '$(buildConfiguration)'
-        #arguments:
-          #po
-          #sol
-          #solution'$(solution)'
-        
-        
-#    - task: VSBuild@1
-#      inputs:
-#        solution: '$(solution)'
-#        #msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(build.artifactStagingDirectory)\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
-#        msbuildArgs: '/t:restore;build'
-#        platform: '$(buildPlatform)'
-#        configuration: '$(buildConfiguration)'
 
 #    - task: CopyFiles@2
 #      inputs:
@@ -70,7 +51,6 @@ stages:
       displayName: 'Publish Artifact drop'
       inputs:
         artifactName: 'drop'
-        #targetPath: '$(build.artifactstagingdirectory)'
         targetPath: '$(Build.SourcesDirectory)'
 
 
@@ -86,40 +66,20 @@ stages:
 #        artifactName: '.netcore2.2'
 #        targetPath: '$(build.artifactstagingdirectory)/netcoreapp2.2'
         
-
-      
-
-- stage: Testt
+- stage: Test
   jobs:
-  - job: Testt
+  - job: Test
     displayName: 'Run Tests'
     pool:
       vmImage: 'windows-latest'
-    steps:
+    steps:  
     - task: DownloadPipelineArtifact@1
       inputs:
         artifactName: 'drop'
-        #artifactName: '.netcore2.2'
 
     - task: DotNetCoreCLI@2
       displayName: Test
       inputs:
         command: 'test'
-        #projects: '**/*Test*/*.csproj'
-        #arguments: '--configuration $(buildConfiguration) --collect "Code coverage"'
         arguments: '--logger trx --collect "Code coverage"'
         nobuild: true
-        #publishTestResults: true
-
-#    - task: VSTest@2
-#      displayName: 'Run Unit Tests'
-#      inputs:
-#        platform: '$(buildPlatform)'
-#        configuration: '$(buildConfiguration)'
-#        searchFolder: '$(build.artifactstagingdirectory)'
-#        testAssemblyVer2: | 
-#            **\$(buildConfiguration)\**\*tests*.dll
-#            !**\*TestAdapter.dll
-#            !**\obj\**
-#        otherConsoleOptions: '/Framework:".NETCoreApp,Version=v2.2"'
-#        codeCoverageEnabled: true
