@@ -1,0 +1,89 @@
+# ASP.NET Core (.NET Framework)
+# Build and test ASP.NET Core projects targeting the full .NET Framework.
+# Add steps that publish symbols, save build artifacts, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+
+trigger:
+- master
+
+variables:
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+
+stages:
+- stage: build
+  jobs:
+  - job: build
+    displayName: 'Run Build'
+    pool:
+      vmImage: 'windows-latest'
+    steps:
+    - task: GitVersion@4
+      inputs:
+        preferBundledVersion: true
+
+    - task: DotNetCoreInstaller@0
+      inputs:
+        version: '2.2.300'
+
+    #- task: NuGetToolInstaller@0 # Doesn't require exact Version live above task
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Restore'
+    #  inputs:
+    #    command: 'restore'
+    #    #projects: '**/*.csproj'
+    #    feedsToUse: 'select'
+      
+      #script: dotnet restore
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Build'
+      inputs:
+        command: 'build'
+
+#    - task: CopyFiles@2
+#      inputs:
+#        SourceFolder: '$(Build.SourcesDirectory)'
+#        Contents: '**/bin/**'
+#        TargetFolder: '$(build.artifactstagingdirectory)\pipelinestest'
+        #flattenFolders: true
+#        OverWrite: true
+
+    - task: PublishPipelineArtifact@0
+      displayName: 'Publish Artifact drop'
+      inputs:
+        artifactName: 'drop'
+        targetPath: '$(Build.SourcesDirectory)'
+
+
+#    - task: PublishPipelineArtifact@0
+#      displayName: 'Publish Artifact drop'
+#      inputs:
+#        artifactName: '.netstandard2.0'
+#        targetPath: '$(build.artifactstagingdirectory)/netstandard2.0'
+    
+#    - task: PublishPipelineArtifact@0
+#      displayName: 'Publish Artifact drop'
+#      inputs:
+#        artifactName: '.netcore2.2'
+#        targetPath: '$(build.artifactstagingdirectory)/netcoreapp2.2'
+        
+- stage: Test
+  jobs:
+  - job: Test
+    displayName: 'Run Tests'
+    pool:
+      vmImage: 'windows-latest'
+    steps:  
+    - task: DownloadPipelineArtifact@1
+      inputs:
+        artifactName: 'drop'
+
+    - task: DotNetCoreCLI@2
+      displayName: Test
+      inputs:
+        command: 'test'
+        arguments: '--logger trx --collect "Code coverage"'
+        nobuild: true
