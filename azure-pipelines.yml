@@ -19,6 +19,11 @@ stages:
     pool:
       vmImage: 'windows-latest'
     steps:
+    - task: gittools.gitversion.gitversion-task.GitVersion@4
+      displayName: GitVersion
+        inputs:
+          preferBundledVersion: true
+          
     - task: DotNetCoreInstaller@0
       inputs:
         version: '2.2.300'
