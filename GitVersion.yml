@@ -16,4 +16,4 @@ commits-since-version-source-padding: 4
 commit-message-incrementing: Enabled
 commit-date-format: 'yyyy-MM-dd'
 ignore:
-  sha: []
+  sha: [d0f84920eead1db5d7887ea847fbd381789c4aed]
