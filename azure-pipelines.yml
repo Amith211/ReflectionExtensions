@@ -102,6 +102,6 @@ stages:
     - task: DotNetCoreCLI@2
       inputs:
         command: 'pack'
-        packagesToPack: '**/*.csproj'
+        packagesToPack: '**/src/**/*.csproj'
         nobuild: true
-        versioningScheme: 'byBuildNumber'
+        buildProperties: 'Version=$(GitVersion.NuGetVersionV2)'
