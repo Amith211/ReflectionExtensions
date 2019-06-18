@@ -87,3 +87,21 @@ stages:
         command: 'test'
         arguments: '--logger trx --collect "Code coverage"'
         nobuild: true
+
+- stage: Deploy
+  jobs:
+  - job: Nuget
+    displayName: 'Deploy to Nuget.org preview'
+    pool:
+      vmImage: 'windows-latest'
+    steps:
+    - task: DownloadPipelineArtifact@1
+      inputs:
+        artifactName: 'drop'
+
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: 'pack'
+        packagesToPack: '**/*.csproj'
+        nobuild: true
+        versioningScheme: 'byBuildNumber'
