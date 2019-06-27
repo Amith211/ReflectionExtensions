@@ -201,13 +201,13 @@ stages:
               artifactName: 'nuget-preview'
               targetPath: $(Build.ArtifactStagingDirectory)
 
-        - task: DotNetCoreCLI@2
-          inputs:
-            command: 'push'
-            packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
-            nuGetFeedType: 'internal'
-            publishVstsFeed: '/b4573900-0d0d-4915-b6b5-cfc2fee08f7d'
-        condition: and(succeeded(), eq(variables['pushPreview'], 'true'))  
+          - task: DotNetCoreCLI@2
+            inputs:
+              command: 'push'
+              packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
+              nuGetFeedType: 'internal'
+              publishVstsFeed: '/b4573900-0d0d-4915-b6b5-cfc2fee08f7d'
+          condition: and(succeeded(), eq(variables['pushPreview'], 'true'))  
 
           #- task: NuGetCommand@2
           #  inputs:
