@@ -181,7 +181,7 @@ stages:
       displayName: SetNugetSemVerVersion
       inputs:
        targetType: inline
-       script: 'echo $env:nugetVersion;'
+       script: 'echo "1"; echo $env:nugetVersion; echo "2"; echo $(nugetVersion);'
 
     - task: DotNetCoreCLI@2
       displayName: Pack
