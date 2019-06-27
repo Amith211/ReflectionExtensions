@@ -168,7 +168,7 @@ stages:
         targetType: inline
         script: |
             $ver = "";
-            if($env:Build.Reason -eq "PullRequest" )
+            if($env:Build_Reason -eq "PullRequest" )
             {
                 $ver = "$env:GITVERSION_MAJORMINORPATCH-Beta.$env:GITVERSION_PRERELEASENUMBER";
             } else 
@@ -176,7 +176,8 @@ stages:
                 $ver = $env:GitVersion_NuGetVersionV2;
             }
             echo "##vso[task.setvariable variable=nugetVersion;isOutput=true]$ver"
-            echo $env:Build.Reason;
+            [Environment]::SetEnvironmentVariable("LC_NUGETVERSION", "$ver", "User")
+            echo $env:Build_Reason;
             echo $ver;
 
     - task: Powershell@2
