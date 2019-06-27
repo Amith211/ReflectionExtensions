@@ -138,11 +138,11 @@ stages:
         #targetPath: $(Build.ArtifactStagingDirectory)
         targetPath: '$(Build.SourcesDirectory)'
 
-    - task: Powershell@2
-      inputs:
-        targetType: inline
-        #script: gci env:*Git* | sort-object name; $(GitVersion.NuGetVersionV2)-Preview$(GitVersion.PreReleaseNumber);
-        script: $env:GitVersion.NuGetVersionV2-Preview$env:GitVersion.PreReleaseNumber;
+#    - task: Powershell@2
+#      inputs:
+#        targetType: inline
+#        #script: gci env:*Git* | sort-object name; $(GitVersion.NuGetVersionV2)-Preview$(GitVersion.PreReleaseNumber);
+#        script: $env:GitVersion.NuGetVersionV2-Preview$env:GitVersion.PreReleaseNumber;
 
 #    - task: Powershell@2
 #      inputs:
