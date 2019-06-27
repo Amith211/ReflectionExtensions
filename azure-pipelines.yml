@@ -189,16 +189,16 @@ stages:
   - deployment: DeployPreview
     displayName: Deploy Preview Nuget.org
     pool:
-      Default
+       name: Default
     environment: Preview
-      strategy:
-        runOnce:
-          deploy:
-            steps:
-            - task: DotNetCoreCLI@2
-              inputs:
-                command: 'push'
-                packagesToPush: '$(Build.ArtifactStagingDirectory)/package/*.nupkg'
-                nuGetFeedType: 'external'
-                publishFeedCredentials: 'Nuget.org'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: DotNetCoreCLI@2
+            inputs:
+              command: 'push'
+              packagesToPush: '$(Build.ArtifactStagingDirectory)/package/*.nupkg'
+              nuGetFeedType: 'external'
+              publishFeedCredentials: 'Nuget.org'
   #condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
