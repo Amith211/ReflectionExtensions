@@ -12,6 +12,7 @@ variables:
   buildConfiguration: 'Release'
   pushPreview: 'internal;nuget.org'
   nugetVersion: ""
+  releaseSkip: 'true'
 
 stages:
 - stage: build
@@ -89,6 +90,8 @@ stages:
         projects: '**/*[Tt]ests/*.csproj'
         arguments: '--logger trx --collect "Code coverage"'
         nobuild: true
+
+## Preview release ##
 
 - stage: DeployPreview
   displayName: 'Deploy Preview'
@@ -215,6 +218,134 @@ stages:
               nuGetFeedType: 'external'
               publishFeedCredentials: 'Nuget.org'
     condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), startswith(variables['Build.SourceBranch'], 'refs/heads/release/')) )
+
+## Stable Release ##
+
+- stage: Deploy Release
+  displayName: 'Deploy Release'
+  jobs:
+  - job: NugetPackRelease
+    displayName: 'Pack Nuget Release'
+    pool:
+      Default
+      #vmImage: 'windows-latest'
+    steps:
+    - task: DownloadPipelineArtifact@1
+      inputs:
+        artifactName: 'vars'
+        #targetPath: $(Build.ArtifactStagingDirectory)
+        targetPath: '$(Build.SourcesDirectory)'
+
+    - task: variablerehydration@0
+      inputs:
+        jsonfiles: '**/meta-*.json'
+
+    - task: DownloadPipelineArtifact@1
+      inputs:
+        artifactName: 'drop'
+        #targetPath: $(Build.ArtifactStagingDirectory)
+        targetPath: '$(Build.SourcesDirectory)'
+
+    - task: DotNetCoreCLI@2
+      displayName: Restore
+      inputs:
+        command: 'restore'
+        restoreSolution: '**/**/*.sln'
+
+#    - task: Powershell@2
+#      name: SetNugetSemVerVersion
+#      displayName: SetNugetSemVerVersion
+#      inputs:
+#        targetType: inline
+#        script: |
+#            $ver = "";
+#            if($env:Build_Reason -eq "PullRequest" )
+#            {
+#                $ver = "$env:GITVERSION_MAJORMINORPATCH-Beta-$env:GITVERSION_PRERELEASENUMBER";
+#            } else 
+#            {
+#                $ver = "$env:GitVersion_NuGetVersionV2-Beta-$env:GITVERSION_PRERELEASENUMBER";
+#            }
+#            echo "##vso[task.setvariable variable=nugetVersion]$ver"
+#            [Environment]::SetEnvironmentVariable("LC_NUGETVERSION", "$ver", "User")
+#            Write-Host "Var is $ver";
+#            Write-Host "Env is $env:LC_NUGETVERSION";
+#            Write-Host "vso is $(nugetVersion)";
+
+    - task: DotNetCoreCLI@2
+      displayName: Pack
+      inputs:
+        command: 'pack'
+        nobuild: true
+        versioningScheme: 'byEnvVar'
+        versionEnvVar: GitVersion_NuGetVersionV2
+        configuration: $(BuildConfiguration)
+        packageFolder: $(Build.ArtifactStagingDirectory)/package
+        arguments: '--no-build --no-restore'
+
+    - task: CopyFiles@2
+      inputs:
+        SourceFolder: '$(Build.ArtifactStagingDirectory)'
+        Contents: '**/*.nupkg'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)/Package'
+      #condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+
+    - task: PublishPipelineArtifact@0
+      displayName: 'Publish Artifact drop'
+      inputs:
+        artifactName: 'nuget-release'
+        targetPath: $(Build.ArtifactStagingDirectory)/package
+      #condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))    
+
+  - deployment: DeployReleaseAzure
+    displayName: Deploy Release to Azure Artifacts
+    pool:
+       name: Default
+    variables:
+        nugetVersion: "t"
+    environment: ReleaseAzure
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: DownloadPipelineArtifact@1
+            inputs:
+              artifactName: 'nuget-release'
+              targetPath: $(Build.ArtifactStagingDirectory)
+
+          - task: DotNetCoreCLI@2
+            displayName: Publish Preview to Artifacts
+            inputs:
+              command: 'push'
+              packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
+              nuGetFeedType: 'internal'
+              publishVstsFeed: '/b4573900-0d0d-4915-b6b5-cfc2fee08f7d'
+    condition: and(succeeded(), ne(variables['releaseSkip'], 'true'), ne(variables['Build.Reason'], 'PullRequest'), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), startswith(variables['Build.SourceBranch'], 'refs/heads/release/')) )
+
+  - deployment: DeployReleaseNuget
+    displayName: Deploy Release to Nuget.org
+    pool:
+       name: Default
+    variables:
+        nugetVersion: "t"
+    environment: ReleaseNuget
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: DownloadPipelineArtifact@1
+            inputs:
+              artifactName: 'nuget-release'
+              targetPath: $(Build.ArtifactStagingDirectory)
+
+          - task: NuGetCommand@2
+            displayName: Publish Release to Nuget.org
+            inputs:
+              command: 'push'
+              packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
+              nuGetFeedType: 'external'
+              publishFeedCredentials: 'Nuget.org'
+    condition: and(succeeded(), ne(variables['releaseSkip'], 'true'), ne(variables['Build.Reason'], 'PullRequest'), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), startswith(variables['Build.SourceBranch'], 'refs/heads/release/')) )
 
           ## Task does not support API key yet.
           #- task: DotNetCoreCLI@2
