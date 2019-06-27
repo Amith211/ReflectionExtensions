@@ -221,7 +221,7 @@ stages:
 
 ## Stable Release ##
 
-- stage: Deploy Release
+- stage: DeployRelease
   displayName: 'Deploy Release'
   jobs:
   - job: NugetPackRelease
