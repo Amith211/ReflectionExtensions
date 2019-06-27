@@ -111,7 +111,12 @@ stages:
     - task: Powershell@2
       inputs:
         targetType: inline
-        script: $env:GitVersion_NuGetVersionV2; dotnet restore; dotnet pack --no-build --no-restore -property:Configuration=Release,version=$env:GitVersion_NuGetVersionV2
+        script: gci env:* | sort-object name;
+
+    - task: Powershell@2
+      inputs:
+        targetType: inline
+        script: dotnet restore; dotnet pack --no-build --no-restore -property:Configuration=Release,version=$env:GitVersion_NuGetVersionV2
         #script: dotnet pack --no-build --no-restore -property:Configuration=Release,version=$env:GitVersion_NuGetVersionV2
         workingDirectory: $(Build.ArtifactStagingDirectory)
 
