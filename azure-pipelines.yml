@@ -105,7 +105,8 @@ stages:
     - task: DownloadPipelineArtifact@1
       inputs:
         artifactName: 'drop'
-        targetPath: '$(Build.SourcesDirectory)'
+        targetPath: $(Build.ArtifactStagingDirectory)/dl
+        #targetPath: '$(Build.SourcesDirectory)'
 
     - task: DotNetCoreCLI@2
       inputs:
