@@ -178,7 +178,7 @@ stages:
             Write-Host "##vso[task.setvariable variable=nugetVersion;isOutput=true]$ver"
             [Environment]::SetEnvironmentVariable("LC_NUGETVERSION", "$ver", "User")
             Write-Host "Var is $ver";
-            Write-Host "Env is env:LC_NUGETVERSION";
+            Write-Host "Env is $env:LC_NUGETVERSION";
             Write-Host "vso is $(nugetVersion)";
 
     - task: Powershell@2
