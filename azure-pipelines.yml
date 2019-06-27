@@ -42,6 +42,7 @@ stages:
       displayName: 'Build'
       inputs:
         command: 'build'
+        arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
 
 #    - task: CopyFiles@2
 #      inputs:
@@ -55,7 +56,8 @@ stages:
       displayName: 'Publish Artifact drop'
       inputs:
         artifactName: 'drop'
-        targetPath: '$(Build.SourcesDirectory)'
+        #targetPath: '$(Build.SourcesDirectory)'
+        targetPath: '$(Build.ArtifactStagingDirectory)'
 
 
 #    - task: PublishPipelineArtifact@0
@@ -85,6 +87,7 @@ stages:
       displayName: Test
       inputs:
         command: 'test'
+        projects: '**/*[Tt]ests/*.csproj'
         arguments: '--logger trx --collect "Code coverage"'
         nobuild: true
 
@@ -98,12 +101,13 @@ stages:
     - task: DownloadPipelineArtifact@1
       inputs:
         artifactName: 'drop'
+        path: 
 
     - task: DotNetCoreCLI@2
       inputs:
         command: 'custom'
         custom: pack
-        arguments: '--no-build -property:Configuration=Release,version=$(GitVersion.NuGetVersionV2)'
+        arguments: '--no-build --no-restore -property:Configuration=Release,version=$(GitVersion.NuGetVersionV2)'
         #command: 'pack'
         ##packagesToPack: '**/src/**/*.csproj'
         #nobuild: true
