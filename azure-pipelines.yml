@@ -69,10 +69,10 @@ stages:
         artifactName: 'drop'
         targetPath: '$(Build.SourcesDirectory)'
         
-- stage: testt
-  displayName: Test
+- stage: test
+  displayName: 'Test'
   jobs:
-  - job: testt
+  - job: test
     displayName: 'Run Tests'
     pool:
       default
