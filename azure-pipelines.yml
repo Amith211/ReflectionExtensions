@@ -141,7 +141,8 @@ stages:
     - task: Powershell@2
       inputs:
         targetType: inline
-        script: gci env:*Git* | sort-object name; $(GitVersion.NuGetVersionV2)-Preview$(GitVersion.PreReleaseNumber);
+        #script: gci env:*Git* | sort-object name; $(GitVersion.NuGetVersionV2)-Preview$(GitVersion.PreReleaseNumber);
+        script: $env:GitVersion.NuGetVersionV2-Preview$env:GitVersion.PreReleaseNumber;
 
 #    - task: Powershell@2
 #      inputs:
@@ -160,19 +161,35 @@ stages:
         #feedsToUse: 'select'
         #workingDirectory: $(Build.ArtifactStagingDirectory)
 
+    - task: Powershell@2
+      displayName: SetNugetSemVerVersion
+      inputs:
+        targetType: inline
+        script: |
+            $ver = "";
+            if($env:Build.Reason -eq "PullRequest" )
+            {
+                $ver = "$env:GITVERSION_MAJORMINORPATCH-Beta.$env:GITVERSION_PRERELEASENUMBER";
+            } else 
+            {
+                $ver = $env:GitVersion_NuGetVersionV2;
+            }
+            echo '##vso[task.setvariable variable=nugetVersion;isOutput=true]$ver' 
+
     - task: DotNetCoreCLI@2
       displayName: Pack
       inputs:
         command: 'pack'
         #packagesToPack: '**/$(Build.ArtifactStagingDirectory)/*.sln'
         nobuild: true
-        #versioningScheme: 'byEnvVar'
-        versioningScheme: 'off'
+        versioningScheme: 'byEnvVar'
+        #versioningScheme: 'off'
         #versionEnvVar: GitVersion_NuGetVersionV2
+        versionEnvVar:nugetVersion
         configuration: $(BuildConfiguration)
         #workingDirectory: $(Build.ArtifactStagingDirectory)
         packageFolder: $(Build.ArtifactStagingDirectory)/package
-        arguments: '--no-build --no-restore -property:version=$(GitVersion.NuGetVersionV2)-Preview$(GitVersion.PreReleaseNumber)'
+        arguments: '--no-build --no-restore'
 
     - task: CopyFiles@2
       inputs:
