@@ -134,8 +134,8 @@ stages:
     - task: DownloadPipelineArtifact@1
       inputs:
         artifactName: 'drop'
-        targetPath: $(Build.ArtifactStagingDirectory)
-        #targetPath: '$(Build.SourcesDirectory)'
+        #targetPath: $(Build.ArtifactStagingDirectory)
+        targetPath: '$(Build.SourcesDirectory)'
 
     - task: Powershell@2
       inputs:
@@ -153,10 +153,11 @@ stages:
       displayName: Restore
       inputs:
         command: 'restore'
-        restoreSolution: '**/$(Build.ArtifactStagingDirectory)/*.sln'
+        restoreSolution: '**/**/*.sln'
+        #restoreSolution: '**/$(Build.ArtifactStagingDirectory)/*.sln'
         #projects: '**/$(Build.ArtifactStagingDirectory)/src/**/*.csproj'
         #feedsToUse: 'select'
-        workingDirectory: $(Build.ArtifactStagingDirectory)
+        #workingDirectory: $(Build.ArtifactStagingDirectory)
 
     - task: DotNetCoreCLI@2
       displayName: Pack
@@ -167,7 +168,8 @@ stages:
         versioningScheme: 'byEnvVar'
         versionEnvVar: GitVersion_NuGetVersionV2
         configuration: $(BuildConfiguration)
-        workingDirectory: $(Build.ArtifactStagingDirectory)
+        #workingDirectory: $(Build.ArtifactStagingDirectory)
+        packageFolder: $(Build.ArtifactStagingDirectory)/package
 
     - task: CopyFiles@2
       inputs:
