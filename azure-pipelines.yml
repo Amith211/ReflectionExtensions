@@ -111,7 +111,7 @@ stages:
     - task: Powershell@2
       inputs:
         targetType: inline
-        script: notnet pack --no-build --no-restore -property:Configuration=Release,version=$env:GitVersion_NuGetVersionV2)
+        script: notnet pack --no-build --no-restore -property:Configuration=Release,version=$env:GitVersion_NuGetVersionV2
         workingDirectory: $(Build.ArtifactStagingDirectory)
 
 #    - task: DotNetCoreCLI@2
