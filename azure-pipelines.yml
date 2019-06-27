@@ -183,7 +183,7 @@ stages:
       displayName: ReadNugetSemVerVersion
       inputs:
        targetType: inline
-       script: "Write-Host 1; Write-Host $env:nugetVersion; Write-Host 2;" 
+       script: "gci env:* | sort-object name; Write-Host 1; Write-Host $env:LC_NUGETVERSION; Write-Host 2;" 
       #Write-Host $(SetNugetSemVerVersion.nugetVersion);"
 
     - task: DotNetCoreCLI@2
