@@ -167,11 +167,12 @@ stages:
         #packagesToPack: '**/$(Build.ArtifactStagingDirectory)/*.sln'
         nobuild: true
         #versioningScheme: 'byEnvVar'
+        versioningScheme: 'off'
         #versionEnvVar: GitVersion_NuGetVersionV2
         configuration: $(BuildConfiguration)
         #workingDirectory: $(Build.ArtifactStagingDirectory)
         packageFolder: $(Build.ArtifactStagingDirectory)/package
-        arguments: '--no-build --no-restore -property:version=$(GitVersion.NuGetVersionV2)-Preview$(GITVERSION.PRERELEASENUMBER)'
+        arguments: '--no-build --no-restore -property:version=$(GitVersion.NuGetVersionV2)-Preview$(GitVersion.PreReleaseNumber)'
 
     - task: CopyFiles@2
       inputs:
