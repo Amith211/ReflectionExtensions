@@ -128,7 +128,7 @@ stages:
 
     - task: variablerehydration@0
       inputs:
-        jsonfiles: '**\meta-*.json'
+        jsonfiles: '**/meta-*.json'
 
     - task: DownloadPipelineArtifact@1
       inputs:
@@ -144,9 +144,24 @@ stages:
     - task: Powershell@2
       inputs:
         targetType: inline
-        script: dotnet restore; dotnet pack --no-build --no-restore -property:Configuration=Release,version=$env:GitVersion_NuGetVersionV2
+        script: dotnet restore; dotnet pack --no-build --no-restore -property:Configuration=Release,version=$env:GitVersion_NuGetVersionV2-Preview$env:GITVERSION_PRERELEASENUMBER
         #script: dotnet pack --no-build --no-restore -property:Configuration=Release,version=$env:GitVersion_NuGetVersionV2
         workingDirectory: $(Build.ArtifactStagingDirectory)
+
+    - task: CopyFiles@2
+      inputs:
+        SourceFolder: '$(Build.ArtifactStagingDirectory)'
+        Contents: '**/*.nupkg'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)/Package'
+      #condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+
+    - task: PublishPipelineArtifact@0
+      displayName: 'Publish Artifact drop'
+      inputs:
+        artifactName: 'nuget-preview'
+        targetPath: $(Build.ArtifactStagingDirectory)/package
+      #condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+      
 
 #    - task: DotNetCoreCLI@2
 #      inputs:
