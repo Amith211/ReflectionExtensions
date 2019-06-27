@@ -161,11 +161,12 @@ stages:
       displayName: Pack
       inputs:
         command: 'pack'
-        packagesToPack: '**/$(Build.ArtifactStagingDirectory)/*.sln'
+        #packagesToPack: '**/$(Build.ArtifactStagingDirectory)/*.sln'
         nobuild: true
         versioningScheme: 'byEnvVar'
         versionEnvVar: GitVersion_NuGetVersionV2
         configuration: $(BuildConfiguration)
+        workingDirectory: $(Build.ArtifactStagingDirectory)
 
     - task: CopyFiles@2
       inputs:
