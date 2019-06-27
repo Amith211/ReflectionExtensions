@@ -174,7 +174,7 @@ stages:
                 $ver = "$env:GITVERSION_MAJORMINORPATCH-Beta.$env:GITVERSION_PRERELEASENUMBER";
             } else 
             {
-                $ver = $env:GitVersion_NuGetVersionV2;
+                $ver = "$env:GitVersion_NuGetVersionV2-Beta.$env:GITVERSION_PRERELEASENUMBER";
             }
             echo "##vso[task.setvariable variable=nugetVersion]$ver"
             [Environment]::SetEnvironmentVariable("LC_NUGETVERSION", "$ver", "User")
@@ -186,7 +186,7 @@ stages:
       displayName: ReadNugetSemVerVersion
       inputs:
        targetType: inline
-       script: "gci env:LC* | sort-object name; Write-Host 1; Write-Host $env:LC_NUGETVERSION; Write-Host 2; Write-Host $(nugetVersion); Write-Host 3;
+       script: "gci env:* | sort-object name; Write-Host 1; Write-Host $env:LC_NUGETVERSION; Write-Host 2; Write-Host $(nugetVersion); Write-Host 3;
       #Write-Host $(SetNugetSemVerVersion.nugetVersion);"
 
     - task: DotNetCoreCLI@2
@@ -198,7 +198,7 @@ stages:
         versioningScheme: 'byEnvVar'
         #versioningScheme: 'off'
         #versionEnvVar: GitVersion_NuGetVersionV2
-        versionEnvVar: (nugetVersion)
+        versionEnvVar: nugetVersion
         configuration: $(BuildConfiguration)
         #workingDirectory: $(Build.ArtifactStagingDirectory)
         packageFolder: $(Build.ArtifactStagingDirectory)/package
