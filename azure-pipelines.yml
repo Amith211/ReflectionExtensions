@@ -108,13 +108,19 @@ stages:
         targetPath: $(Build.ArtifactStagingDirectory)
         #targetPath: '$(Build.SourcesDirectory)'
 
-    - task: DotNetCoreCLI@2
+    - task: Powershell@2
       inputs:
-        command: 'custom'
-        custom: pack
-        arguments: '--no-build --no-restore -property:Configuration=Release,version=$(GitVersion.NuGetVersionV2)'
-        #command: 'pack'
-        packagesToPack: '**/$(Build.ArtifactStagingDirectory)/*.sln'
-        #packagesToPack: '**/$(Build.ArtifactStagingDirectory)/src/**/*.csproj'
-        #nobuild: true
-        #buildProperties: 'Version=$(GitVersion.NuGetVersionV2)'
+        targetType: inline
+        script: notnet pack --no-build --no-restore -property:Configuration=Release,version=$(GitVersion.NuGetVersionV2)
+        workingDirectory: $(Build.ArtifactStagingDirectory)
+
+#    - task: DotNetCoreCLI@2
+#      inputs:
+#        command: 'custom'
+#        custom: pack
+#        arguments: '--no-build --no-restore -property:Configuration=Release,version=$(GitVersion.NuGetVersionV2)'
+#        #command: 'pack'
+#        packagesToPack: '**/$(Build.ArtifactStagingDirectory)/*.sln'
+#        #packagesToPack: '**/$(Build.ArtifactStagingDirectory)/src/**/*.csproj'
+#        #nobuild: true
+#        #buildProperties: 'Version=$(GitVersion.NuGetVersionV2)'
