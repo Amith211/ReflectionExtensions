@@ -201,4 +201,4 @@ stages:
               packagesToPush: '$(Build.ArtifactStagingDirectory)/package/*.nupkg'
               nuGetFeedType: 'external'
               publishFeedCredentials: 'Nuget.org'
-  #condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest')) 
+  #condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))  
