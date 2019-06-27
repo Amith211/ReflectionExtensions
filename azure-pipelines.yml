@@ -66,8 +66,10 @@ stages:
         targetPath: '$(Build.SourcesDirectory)'
         #targetPath: '$(Build.ArtifactStagingDirectory)'
 
-    - task: nkdagility.variablehydration.variabledehydration-task.variabledehydration@0
-      displayName: 'Save Build Variables GITVERSION,BUILD'
+    - task: variabledehydration@0
+      inputs:
+        prefixes: 'GITVERSION,BUILD'
+        outpath: '$(Build.ArtifactStagingDirectory)'
 
 #    - task: PublishPipelineArtifact@0
 #      displayName: 'Publish Artifact drop'
@@ -109,14 +111,15 @@ stages:
       Default
       #vmImage: 'windows-latest'
     steps:
+    - task: variablerehydration@0
+      inputs:
+        jsonfiles: '**\meta-*.json'
+
     - task: DownloadPipelineArtifact@1
       inputs:
         artifactName: 'drop'
         targetPath: $(Build.ArtifactStagingDirectory)
         #targetPath: '$(Build.SourcesDirectory)'
-
-    - task: nkdagility.variablehydration.variablerehydration-task.variablerehydration@0
-      displayName: 'Retreive Build Variables GITVERSION,BUILD'
 
     - task: Powershell@2
       inputs:
