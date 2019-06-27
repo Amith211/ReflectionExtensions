@@ -59,6 +59,11 @@ stages:
         #flattenFolders: true
 #        OverWrite: true
 
+    - task: variabledehydration@0
+      inputs:
+        prefixes: 'GITVERSION,BUILD'
+        output: '$(Build.SourcesDirectory)'
+
     - task: PublishPipelineArtifact@0
       displayName: 'Publish Artifact drop'
       inputs:
@@ -66,10 +71,6 @@ stages:
         targetPath: '$(Build.SourcesDirectory)'
         #targetPath: '$(Build.ArtifactStagingDirectory)'
 
-    - task: variabledehydration@0
-      inputs:
-        prefixes: 'GITVERSION,BUILD'
-        output: '$(Build.SourcesDirectory)'
         #outpath: '$(Build.ArtifactStagingDirectory)'
 
 #    - task: PublishPipelineArtifact@0
