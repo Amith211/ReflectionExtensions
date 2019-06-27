@@ -209,12 +209,13 @@ stages:
             publishVstsFeed: '/b4573900-0d0d-4915-b6b5-cfc2fee08f7d'
         condition: and(succeeded(), eq(variables['pushPreview'], 'true'))  
 
-          - task: NuGetCommand@2
-            inputs:
-              command: 'push'
-              packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
-              nuGetFeedType: 'external'
-              publishFeedCredentials: 'Nuget.org'
+          #- task: NuGetCommand@2
+          #  inputs:
+          #    command: 'push'
+          #    packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
+          #    nuGetFeedType: 'external'
+          #    publishFeedCredentials: 'Nuget.org'
+          #condition: and(succeeded(), eq(variables['pushPreview'], 'true'))
 
           ## Task does not support API key yet.
           #- task: DotNetCoreCLI@2
@@ -223,5 +224,5 @@ stages:
           #    packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
           #    nuGetFeedType: 'external'
           #    publishFeedCredentials: 'Nuget.org'
-  condition: and(succeeded(), eq(variables['pushPreview'], 'true'))  
+  
   #condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))  
