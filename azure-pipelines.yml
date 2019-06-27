@@ -114,6 +114,7 @@ stages:
         custom: pack
         arguments: '--no-build --no-restore -property:Configuration=Release,version=$(GitVersion.NuGetVersionV2)'
         #command: 'pack'
-        packagesToPack: '**/$(Build.ArtifactStagingDirectory)/src/**/*.csproj'
+        packagesToPack: '**/$(Build.ArtifactStagingDirectory)/*.sln'
+        #packagesToPack: '**/$(Build.ArtifactStagingDirectory)/src/**/*.csproj'
         #nobuild: true
         #buildProperties: 'Version=$(GitVersion.NuGetVersionV2)'
