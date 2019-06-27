@@ -105,7 +105,7 @@ stages:
     - task: DownloadPipelineArtifact@1
       inputs:
         artifactName: 'drop'
-        targetPath: $(Build.ArtifactStagingDirectory)/dl
+        targetPath: $(Build.ArtifactStagingDirectory)
         #targetPath: '$(Build.SourcesDirectory)'
 
     - task: DotNetCoreCLI@2
@@ -114,6 +114,6 @@ stages:
         custom: pack
         arguments: '--no-build --no-restore -property:Configuration=Release,version=$(GitVersion.NuGetVersionV2)'
         #command: 'pack'
-        ##packagesToPack: '**/src/**/*.csproj'
+        packagesToPack: '**/$(Build.ArtifactStagingDirectory)/src/**/*.csproj'
         #nobuild: true
         #buildProperties: 'Version=$(GitVersion.NuGetVersionV2)'
