@@ -17,7 +17,7 @@ stages:
   - job: build
     displayName: 'Run Build'
     pool:
-      default
+      Default
       #vmImage: 'windows-latest'
     steps:
     - task: GitVersion@4
@@ -98,7 +98,7 @@ stages:
   - job: Nuget
     displayName: 'Deploy to Nuget.org preview'
     pool:
-      default
+      Default
       #vmImage: 'windows-latest'
     steps:
     - task: DownloadPipelineArtifact@1
