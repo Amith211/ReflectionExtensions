@@ -69,7 +69,8 @@ stages:
     - task: variabledehydration@0
       inputs:
         prefixes: 'GITVERSION,BUILD'
-        outpath: '$(Build.ArtifactStagingDirectory)'
+        output: '$(Build.SourcesDirectory)'
+        #outpath: '$(Build.ArtifactStagingDirectory)'
 
 #    - task: PublishPipelineArtifact@0
 #      displayName: 'Publish Artifact drop'
