@@ -101,7 +101,9 @@ stages:
 
     - task: DotNetCoreCLI@2
       inputs:
-        command: 'pack'
-        #packagesToPack: '**/src/**/*.csproj'
-        nobuild: true
-        buildProperties: 'Version=$(GitVersion.NuGetVersionV2)'
+        command: 'custom'
+        custom: 'pack --no-build -property:Configuration=Release,version=$(GitVersion.NuGetVersionV2)'
+        #command: 'pack'
+        ##packagesToPack: '**/src/**/*.csproj'
+        #nobuild: true
+        #buildProperties: 'Version=$(GitVersion.NuGetVersionV2)'
