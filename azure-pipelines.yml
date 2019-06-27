@@ -175,7 +175,7 @@ stages:
             {
                 $ver = $env:GitVersion_NuGetVersionV2;
             }
-            echo '##vso[task.setvariable variable=nugetVersion;isOutput=true]$ver' 
+            echo "##vso[task.setvariable variable=nugetVersion;isOutput=true]$ver" 
 
     - task: Powershell@2
       displayName: SetNugetSemVerVersion
