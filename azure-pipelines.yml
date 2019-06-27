@@ -24,6 +24,11 @@ stages:
       inputs:
         preferBundledVersion: true
 
+    - task: Powershell@2
+      inputs:
+        targetType: inline
+        script: gci env:*Git* | sort-object name;
+
     - task: DotNetCoreInstaller@0
       inputs:
         version: '2.2.300'
@@ -111,7 +116,7 @@ stages:
     - task: Powershell@2
       inputs:
         targetType: inline
-        script: gci env:* | sort-object name;
+        script: gci env:*Git* | sort-object name;
 
     - task: Powershell@2
       inputs:
