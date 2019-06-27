@@ -62,7 +62,14 @@ stages:
     - task: variabledehydration@0
       inputs:
         prefixes: 'GITVERSION,BUILD'
-        output: '$(build.artifactstagingdirectory)/vars'
+        #output: $(Build.SourcesDirectory)
+        output: '$(build.artifactstagingdirectory)'
+
+    - task: PublishPipelineArtifact@0
+      displayName: 'Publish Artifact drop'
+      inputs:
+        artifactName: 'vars'
+        targetPath: '$(build.artifactstagingdirectory)'
 
     - task: PublishPipelineArtifact@0
       displayName: 'Publish Artifact drop'
@@ -113,6 +120,12 @@ stages:
       Default
       #vmImage: 'windows-latest'
     steps:
+    - task: DownloadPipelineArtifact@1
+      inputs:
+        artifactName: 'vars'
+        #targetPath: $(Build.ArtifactStagingDirectory)
+        targetPath: '$(Build.SourcesDirectory)'
+
     - task: variablerehydration@0
       inputs:
         jsonfiles: '**\meta-*.json'
