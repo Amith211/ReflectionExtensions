@@ -221,6 +221,8 @@ stages:
     displayName: Deploy Preview Nuget.org
     pool:
        name: Default
+    variables:
+        nugetVersion: "t"
     environment: Preview
     strategy:
       runOnce:
