@@ -188,15 +188,15 @@ stages:
 #        #nobuild: true
 #        #buildProperties: 'Version=$(GitVersion.NuGetVersionV2)'
 
-  - deployment: DeployPreview
-    displayName: Deploy Preview Nuget.org
-    pool:
-      Default
-    environment: Preview
-      strategy:
-        runOnce:
-          deploy:
-            steps:
-            - task: DotNetCoreCLI@2
-              inputs:
-                command: push
+#  - deployment: DeployPreview
+#    displayName: Deploy Preview Nuget.org
+#    pool:
+#      Default
+#    environment: Preview
+#      strategy:
+#        runOnce:
+#          deploy:
+#            steps:
+#            - task: DotNetCoreCLI@2
+#              inputs:
+#                command: push
