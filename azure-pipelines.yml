@@ -70,7 +70,7 @@ stages:
         targetPath: '$(Build.SourcesDirectory)'
         
 - stage: test
-  displayName: 'Test'
+  displayName: 'Test.'
   jobs:
   - job: test
     displayName: 'Run Tests'
