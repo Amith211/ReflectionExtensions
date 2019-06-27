@@ -10,7 +10,7 @@ variables:
   solution: '**/*.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
-  pushPreview: 'internal'
+  pushPreview: 'internal;nuget.org'
   nugetVersion: ""
 
 stages:
@@ -218,13 +218,13 @@ stages:
         targetPath: $(Build.ArtifactStagingDirectory)/package
       #condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))    
 
-  - deployment: DeployPreview
-    displayName: Deploy Preview Nuget.org
+  - deployment: DeployPreviewAzure
+    displayName: Deploy Preview to Azure Artifacts
     pool:
        name: Default
     variables:
         nugetVersion: "t"
-    environment: Preview
+    environment: PreviewAzure
     strategy:
       runOnce:
         deploy:
@@ -243,20 +243,37 @@ stages:
               publishVstsFeed: '/b4573900-0d0d-4915-b6b5-cfc2fee08f7d'
             condition: and(succeeded(), contains(variables['pushPreview'], 'internal'))  
 
-          #- task: NuGetCommand@2
-          #  inputs:
-          #    command: 'push'
-          #    packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
-          #    nuGetFeedType: 'external'
-          #    publishFeedCredentials: 'Nuget.org'
-          #condition: and(succeeded(), eq(variables['pushPreview'], 'true'))
+  - deployment: DeployPreviewNuget
+    displayName: Deploy Preview Nuget.org
+    pool:
+       name: Default
+    variables:
+        nugetVersion: "t"
+    environment: PreviewNuget
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: DownloadPipelineArtifact@1
+            inputs:
+              artifactName: 'nuget-preview'
+              targetPath: $(Build.ArtifactStagingDirectory)
+
+          - task: NuGetCommand@2
+            displayName: Publish Preview to Nuget.org
+            inputs:
+              command: 'push'
+              packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
+              nuGetFeedType: 'external'
+              publishFeedCredentials: 'Nuget.org'
+          condition: and(succeeded(), eq(variables['pushPreview'], 'nuget.org'))
 
           ## Task does not support API key yet.
           #- task: DotNetCoreCLI@2
+          #  displayName: Publish Preview to Nuget.org
           #  inputs:
           #    command: 'push'
           #    packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
-          #    nuGetFeedType: 'external'
-          #    publishFeedCredentials: 'Nuget.org'
-  
-  #condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))  
+          #    nuGetFeedType: 'internal'
+          #    publishVstsFeed: '/b4573900-0d0d-4915-b6b5-cfc2fee08f7d'
+          #  condition: and(succeeded(), , ne(variables['Build.Reason'], 'PullRequest'), contains(variables['pushPreview'], 'nuget.org'))
