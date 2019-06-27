@@ -25,11 +25,12 @@ stages:
     - task: GitVersion@4
       inputs:
         preferBundledVersion: true
-
-    - task: Powershell@2
-      inputs:
-        targetType: inline
-        script: gci env:*Git* | sort-object name;
+    
+    ## Debug Task to Show variables
+    #- task: Powershell@2
+    #  inputs:
+    #    targetType: inline
+    #    script: gci env:*Git* | sort-object name;
 
     - task: DotNetCoreInstaller@0
       inputs:
@@ -42,24 +43,13 @@ stages:
     #  inputs:
     #    command: 'restore'
     #    #projects: '**/*.csproj'
-    #    feedsToUse: 'select'
-      
-      #script: dotnet restore
+    #    feedsToUse: 'select'    
 
     - task: DotNetCoreCLI@2
       displayName: 'Build'
       inputs:
         command: 'build'
         arguments: '--configuration $(BuildConfiguration)'
-        #arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
-
-#    - task: CopyFiles@2
-#      inputs:
-#        SourceFolder: '$(Build.SourcesDirectory)'
-#        Contents: '**/bin/**'
-#        TargetFolder: '$(build.artifactstagingdirectory)\pipelinestest'
-        #flattenFolders: true
-#        OverWrite: true
 
     - task: variabledehydration@0
       inputs:
@@ -78,23 +68,9 @@ stages:
       inputs:
         artifactName: 'drop'
         targetPath: '$(Build.SourcesDirectory)'
-        #targetPath: '$(Build.ArtifactStagingDirectory)'
-
-        #outpath: '$(Build.ArtifactStagingDirectory)'
-
-#    - task: PublishPipelineArtifact@0
-#      displayName: 'Publish Artifact drop'
-#      inputs:
-#        artifactName: '.netstandard2.0'
-#        targetPath: '$(build.artifactstagingdirectory)/netstandard2.0'
-    
-#    - task: PublishPipelineArtifact@0
-#      displayName: 'Publish Artifact drop'
-#      inputs:
-#        artifactName: '.netcore2.2'
-#        targetPath: '$(build.artifactstagingdirectory)/netcoreapp2.2'
         
 - stage: Test
+  displayName: Test
   jobs:
   - job: Test
     displayName: 'Run Tests'
@@ -139,28 +115,11 @@ stages:
         #targetPath: $(Build.ArtifactStagingDirectory)
         targetPath: '$(Build.SourcesDirectory)'
 
-#    - task: Powershell@2
-#      inputs:
-#        targetType: inline
-#        #script: gci env:*Git* | sort-object name; $(GitVersion.NuGetVersionV2)-Preview$(GitVersion.PreReleaseNumber);
-#        script: $env:GitVersion.NuGetVersionV2-Preview$env:GitVersion.PreReleaseNumber;
-
-#    - task: Powershell@2
-#      inputs:
-#        targetType: inline
-#        script: dotnet restore; dotnet pack --no-build --no-restore -property:Configuration=$env:BuildConfiguration,version=$env:GitVersion_NuGetVersionV2-Preview$env:GITVERSION_PRERELEASENUMBER
-#        #script: dotnet pack --no-build --no-restore -property:Configuration=Release,version=$env:GitVersion_NuGetVersionV2
-#        workingDirectory: $(Build.ArtifactStagingDirectory)
-
     - task: DotNetCoreCLI@2
       displayName: Restore
       inputs:
         command: 'restore'
         restoreSolution: '**/**/*.sln'
-        #restoreSolution: '**/$(Build.ArtifactStagingDirectory)/*.sln'
-        #projects: '**/$(Build.ArtifactStagingDirectory)/src/**/*.csproj'
-        #feedsToUse: 'select'
-        #workingDirectory: $(Build.ArtifactStagingDirectory)
 
     - task: Powershell@2
       name: SetNugetSemVerVersion
@@ -182,25 +141,14 @@ stages:
             Write-Host "Env is $env:LC_NUGETVERSION";
             Write-Host "vso is $(nugetVersion)";
 
-    - task: Powershell@2
-      displayName: ReadNugetSemVerVersion
-      inputs:
-       targetType: inline
-       script: "gci env:* | sort-object name; Write-Host 1; Write-Host $env:LC_NUGETVERSION; Write-Host 2; Write-Host $(nugetVersion); Write-Host 3;
-      #Write-Host $(SetNugetSemVerVersion.nugetVersion);"
-
     - task: DotNetCoreCLI@2
       displayName: Pack
       inputs:
         command: 'pack'
-        #packagesToPack: '**/$(Build.ArtifactStagingDirectory)/*.sln'
         nobuild: true
         versioningScheme: 'byEnvVar'
-        #versioningScheme: 'off'
-        #versionEnvVar: GitVersion_NuGetVersionV2
         versionEnvVar: nugetVersion
         configuration: $(BuildConfiguration)
-        #workingDirectory: $(Build.ArtifactStagingDirectory)
         packageFolder: $(Build.ArtifactStagingDirectory)/package
         arguments: '--no-build --no-restore'
 
@@ -266,7 +214,7 @@ stages:
               packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
               nuGetFeedType: 'external'
               publishFeedCredentials: 'Nuget.org'
-          condition: and(succeeded(), eq(variables['pushPreview'], 'nuget.org'))
+    condition: and(succeeded(), , ne(variables['Build.Reason'], 'PullRequest'), or(eq(variables['Build.'])) )
 
           ## Task does not support API key yet.
           #- task: DotNetCoreCLI@2
