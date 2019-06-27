@@ -163,6 +163,7 @@ stages:
         #workingDirectory: $(Build.ArtifactStagingDirectory)
 
     - task: Powershell@2
+      name: SetNugetSemVerVersion
       displayName: SetNugetSemVerVersion
       inputs:
         targetType: inline
@@ -175,7 +176,7 @@ stages:
             {
                 $ver = $env:GitVersion_NuGetVersionV2;
             }
-            Write-Host "##vso[task.setvariable variable=nugetVersion;isOutput=true]$ver"
+            echo "##vso[task.setvariable variable=nugetVersion]$ver"
             [Environment]::SetEnvironmentVariable("LC_NUGETVERSION", "$ver", "User")
             Write-Host "Var is $ver";
             Write-Host "Env is $env:LC_NUGETVERSION";
@@ -185,7 +186,7 @@ stages:
       displayName: ReadNugetSemVerVersion
       inputs:
        targetType: inline
-       script: "gci env:LC* | sort-object name; Write-Host 1; Write-Host $env:LC_NUGETVERSION; Write-Host 2; Write-Host $(nugetVersion)
+       script: "gci env:LC* | sort-object name; Write-Host 1; Write-Host $env:LC_NUGETVERSION; Write-Host 2; Write-Host $(nugetVersion); Write-Host 3; Write-Host $(SetNugetSemVerVersion.nugetVersion)
       #Write-Host $(SetNugetSemVerVersion.nugetVersion);"
 
     - task: DotNetCoreCLI@2
