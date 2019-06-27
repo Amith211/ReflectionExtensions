@@ -150,12 +150,15 @@ stages:
 #        workingDirectory: $(Build.ArtifactStagingDirectory)
 
     - task: DotNetCoreCLI@2
+      displayName: Restore
       inputs:
         command: 'restore'
-        projects: '**/$(Build.ArtifactStagingDirectory)/src/**/*.csproj'
+        restoreSolution: '**/$(Build.ArtifactStagingDirectory)/*.sln'
+        #projects: '**/$(Build.ArtifactStagingDirectory)/src/**/*.csproj'
         #feedsToUse: 'select'
 
     - task: DotNetCoreCLI@2
+      displayName: Pack
       inputs:
         command: 'pack'
         packagesToPack: '**/$(Build.ArtifactStagingDirectory)/src/**/*.csproj'
