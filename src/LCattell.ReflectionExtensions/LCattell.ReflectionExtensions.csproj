@@ -5,7 +5,6 @@
     <Company>Louis Cattell (Amith)</Company>
     <Description>Reflection Extenions</Description>
     <PackageId>LCattell.ReflectionExtensions</PackageId>
-    <Version>0.1.0</Version>
     <PackageReleaseNotes></PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/Amith211/ReflectionExtensions</PackageProjectUrl>
     <Copyright>Copyright 2019</Copyright>
