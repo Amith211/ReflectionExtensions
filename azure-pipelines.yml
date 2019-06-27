@@ -43,7 +43,8 @@ stages:
       displayName: 'Build'
       inputs:
         command: 'build'
-        arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+        arguments: '--configuration $(BuildConfiguration)'
+        #arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
 
 #    - task: CopyFiles@2
 #      inputs:
@@ -57,8 +58,8 @@ stages:
       displayName: 'Publish Artifact drop'
       inputs:
         artifactName: 'drop'
-        #targetPath: '$(Build.SourcesDirectory)'
-        targetPath: '$(Build.ArtifactStagingDirectory)'
+        targetPath: '$(Build.SourcesDirectory)'
+        #targetPath: '$(Build.ArtifactStagingDirectory)'
 
 
 #    - task: PublishPipelineArtifact@0
@@ -104,6 +105,7 @@ stages:
     - task: DownloadPipelineArtifact@1
       inputs:
         artifactName: 'drop'
+        targetPath: '$(Build.SourcesDirectory)'
 
     - task: DotNetCoreCLI@2
       inputs:
