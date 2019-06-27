@@ -184,7 +184,7 @@ stages:
       displayName: SetNugetSemVerVersion
       inputs:
        targetType: inline
-       script: "echo 1; echo $env:nugetVersion; echo 2; echo $(nugetVersion);"
+       script: "echo 1; echo $env:nugetVersion; echo 2; echo $(SetNugetSemVerVersion.nugetVersion);"
 
     - task: DotNetCoreCLI@2
       displayName: Pack
@@ -195,7 +195,7 @@ stages:
         versioningScheme: 'byEnvVar'
         #versioningScheme: 'off'
         #versionEnvVar: GitVersion_NuGetVersionV2
-        versionEnvVar: nugetVersion
+        versionEnvVar: SetNugetSemVerVersion.nugetVersion
         configuration: $(BuildConfiguration)
         #workingDirectory: $(Build.ArtifactStagingDirectory)
         packageFolder: $(Build.ArtifactStagingDirectory)/package
