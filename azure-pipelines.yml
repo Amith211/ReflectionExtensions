@@ -252,26 +252,6 @@ stages:
         command: 'restore'
         restoreSolution: '**/**/*.sln'
 
-#    - task: Powershell@2
-#      name: SetNugetSemVerVersion
-#      displayName: SetNugetSemVerVersion
-#      inputs:
-#        targetType: inline
-#        script: |
-#            $ver = "";
-#            if($env:Build_Reason -eq "PullRequest" )
-#            {
-#                $ver = "$env:GITVERSION_MAJORMINORPATCH-Beta-$env:GITVERSION_PRERELEASENUMBER";
-#            } else 
-#            {
-#                $ver = "$env:GitVersion_NuGetVersionV2-Beta-$env:GITVERSION_PRERELEASENUMBER";
-#            }
-#            echo "##vso[task.setvariable variable=nugetVersion]$ver"
-#            [Environment]::SetEnvironmentVariable("LC_NUGETVERSION", "$ver", "User")
-#            Write-Host "Var is $ver";
-#            Write-Host "Env is $env:LC_NUGETVERSION";
-#            Write-Host "vso is $(nugetVersion)";
-
     - task: DotNetCoreCLI@2
       displayName: Pack
       inputs:
