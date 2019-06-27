@@ -214,7 +214,7 @@ stages:
               packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
               nuGetFeedType: 'external'
               publishFeedCredentials: 'Nuget.org'
-    condition: and(succeeded(), , ne(variables['Build.Reason'], 'PullRequest'), or(eq(variables['Build.'])) )
+    condition: and(succeeded(), , ne(variables['Build.Reason'], 'PullRequest'), or(eq(variables['Build.SourceBranch'], 'master'), startswith(variables['Build.SourceBranch'], 'release/')) )
 
           ## Task does not support API key yet.
           #- task: DotNetCoreCLI@2
