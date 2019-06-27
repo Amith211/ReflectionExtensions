@@ -185,7 +185,7 @@ stages:
         versioningScheme: 'byEnvVar'
         #versioningScheme: 'off'
         #versionEnvVar: GitVersion_NuGetVersionV2
-        versionEnvVar:nugetVersion
+        versionEnvVar: nugetVersion
         configuration: $(BuildConfiguration)
         #workingDirectory: $(Build.ArtifactStagingDirectory)
         packageFolder: $(Build.ArtifactStagingDirectory)/package
