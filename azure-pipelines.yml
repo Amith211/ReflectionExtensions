@@ -156,6 +156,7 @@ stages:
         restoreSolution: '**/$(Build.ArtifactStagingDirectory)/*.sln'
         #projects: '**/$(Build.ArtifactStagingDirectory)/src/**/*.csproj'
         #feedsToUse: 'select'
+        workingDirectory: $(Build.ArtifactStagingDirectory)
 
     - task: DotNetCoreCLI@2
       displayName: Pack
