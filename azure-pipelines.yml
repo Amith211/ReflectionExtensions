@@ -171,7 +171,7 @@ stages:
         configuration: $(BuildConfiguration)
         #workingDirectory: $(Build.ArtifactStagingDirectory)
         packageFolder: $(Build.ArtifactStagingDirectory)/package
-        arguments: '--no-build --no-restore -property:version=$env:GitVersion_NuGetVersionV2-Preview$env:GITVERSION_PRERELEASENUMBER'
+        arguments: '--no-build --no-restore -property:version=$(GitVersion.NuGetVersionV2)-Preview$(GITVERSION.PRERELEASENUMBER)'
 
     - task: CopyFiles@2
       inputs:
