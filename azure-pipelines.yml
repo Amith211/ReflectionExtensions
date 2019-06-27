@@ -113,7 +113,7 @@ stages:
         nobuild: true
 
 - stage: Deploy
-    displayName: 'Deploy to Nuget.org preview'
+  displayName: 'Deploy to Nuget.org preview'
   jobs:
   - job: Nuget
     displayName: 'Deploy to Nuget.org preview'
