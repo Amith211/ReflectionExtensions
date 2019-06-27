@@ -112,11 +112,11 @@ stages:
         arguments: '--logger trx --collect "Code coverage"'
         nobuild: true
 
-- stage: Deploy
-  displayName: 'Deploy to Nuget.org preview'
+- stage: DeployPreview
+  displayName: 'Deploy Preview Nuget.org'
   jobs:
-  - job: Nuget
-    displayName: 'Deploy to Nuget.org preview'
+  - job: NugetPackPreview
+    displayName: 'Pack Nuget preview'
     pool:
       Default
       #vmImage: 'windows-latest'
@@ -142,12 +142,26 @@ stages:
         targetType: inline
         script: gci env:*Git* | sort-object name;
 
-    - task: Powershell@2
+#    - task: Powershell@2
+#      inputs:
+#        targetType: inline
+#        script: dotnet restore; dotnet pack --no-build --no-restore -property:Configuration=$env:BuildConfiguration,version=$env:GitVersion_NuGetVersionV2-Preview$env:GITVERSION_PRERELEASENUMBER
+#        #script: dotnet pack --no-build --no-restore -property:Configuration=Release,version=$env:GitVersion_NuGetVersionV2
+#        workingDirectory: $(Build.ArtifactStagingDirectory)
+
+    - task: DotNetCoreCLI@2
       inputs:
-        targetType: inline
-        script: dotnet restore; dotnet pack --no-build --no-restore -property:Configuration=$env:BuildConfiguration,version=$env:GitVersion_NuGetVersionV2-Preview$env:GITVERSION_PRERELEASENUMBER
-        #script: dotnet pack --no-build --no-restore -property:Configuration=Release,version=$env:GitVersion_NuGetVersionV2
-        workingDirectory: $(Build.ArtifactStagingDirectory)
+        command: 'restore'
+        projects: '**/$(Build.ArtifactStagingDirectory)/src/**/*.csproj'
+        #feedsToUse: 'select'
+
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: 'pack'
+        packagesToPack: '**/$(Build.ArtifactStagingDirectory)/src/**/*.csproj'
+        nobuild: true
+        versioningScheme: 'byEnvVar'
+        versionEnvVar: GitVersion_NuGetVersionV2
 
     - task: CopyFiles@2
       inputs:
@@ -163,7 +177,6 @@ stages:
         targetPath: $(Build.ArtifactStagingDirectory)/package
       #condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
       
-
 #    - task: DotNetCoreCLI@2
 #      inputs:
 #        command: 'custom'
@@ -174,3 +187,16 @@ stages:
 #        #packagesToPack: '**/$(Build.ArtifactStagingDirectory)/src/**/*.csproj'
 #        #nobuild: true
 #        #buildProperties: 'Version=$(GitVersion.NuGetVersionV2)'
+
+  - deployment: DeployPreview
+    displayName: Deploy Preview Nuget.org
+    pool:
+      Default
+    environment: Preview
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+            - task: DotNetCoreCLI@2
+              inputs:
+                command: push
