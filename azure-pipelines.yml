@@ -101,7 +101,6 @@ stages:
     - task: DownloadPipelineArtifact@1
       inputs:
         artifactName: 'drop'
-        path: 
 
     - task: DotNetCoreCLI@2
       inputs:
