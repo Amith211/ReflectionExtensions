@@ -138,7 +138,7 @@ stages:
             {
                 $ver = "$env:GITVERSION_MAJORMINORPATCH-$prereleaseTag-$env:GITVERSION_PRERELEASENUMBER";
             } 
-            else if($env:BUILD_SOURCEBRANCHNAME -eq "master")
+            elseif($env:BUILD_SOURCEBRANCHNAME -eq "master")
             {
                 $ver = "$env:GitVersion_NuGetVersionV2-$prereleaseTag"
             }
