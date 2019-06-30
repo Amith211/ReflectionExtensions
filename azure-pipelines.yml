@@ -193,11 +193,11 @@ stages:
               artifactName: 'nuget-preview'
               targetPath: $(Build.ArtifactStagingDirectory)
 
-          - task: DotNetCoreCLI@2
+          - task: NuGetCommand@2
             displayName: Publish Preview to Artifacts
             inputs:
               command: 'push'
-              packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
+              packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
               nuGetFeedType: 'internal'
               publishVstsFeed: '/b4573900-0d0d-4915-b6b5-cfc2fee08f7d'
               allowPackageConflicts: true
@@ -304,11 +304,11 @@ stages:
               artifactName: 'nuget-release'
               targetPath: $(Build.ArtifactStagingDirectory)
 
-          - task: DotNetCoreCLI@2
+          - task: NuGetCommand@2
             displayName: Publish Preview to Artifacts
             inputs:
               command: 'push'
-              packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
+              packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
               nuGetFeedType: 'internal'
               publishVstsFeed: '/b4573900-0d0d-4915-b6b5-cfc2fee08f7d'
               allowPackageConflicts: true
