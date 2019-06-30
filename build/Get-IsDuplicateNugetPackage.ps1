@@ -54,7 +54,7 @@ function Get-PackageRootJson {
     param (
         [string]$PackageId
     )
-    $json = (Invoke-WebRequest https://api.nuget.org/v3/registration3/lcattell.reflectionextensions/index.json) | ConvertFrom-Json;
+    $json = (Invoke-WebRequest https://api.nuget.org/v3/registration3/lcattell.reflectionextensions/index.json -UseBasicParsing) | ConvertFrom-Json;
     
     $json;
 }
