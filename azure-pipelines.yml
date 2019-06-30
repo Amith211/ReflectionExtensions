@@ -227,7 +227,7 @@ stages:
               script: |
                  . $(Build.SourcesDirectory)/build/Get-IsDuplicateNugetPackage.ps1
                   
-                  $isDuplicate = Get-IsDuplicate -PackageId "LCattell.ReflectionExtensions" -Version "GitVersion_NuGetVersionV2";
+                  $isDuplicate = Get-IsDuplicateNugetPackage -PackageId "LCattell.ReflectionExtensions" -Version "$env:GitVersion_NuGetVersionV2";
                    
                   echo "##vso[task.setvariable variable=$isDuplicate]$isDuplicate";
 
@@ -350,7 +350,7 @@ stages:
               script: |
                  . $(Build.SourcesDirectory)/build/Get-IsDuplicateNugetPackage.ps1
                   
-                  $isDuplicate = Get-IsDuplicate -PackageId "LCattell.ReflectionExtensions" -Version "GitVersion_NuGetVersionV2";
+                  $isDuplicate = Get-IsDuplicateNugetPackage -PackageId "LCattell.ReflectionExtensions" -Version "$nv:GitVersion_NuGetVersionV2";
                    
                   echo "##vso[task.setvariable variable=$isDuplicate]$isDuplicate";
 
