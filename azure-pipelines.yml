@@ -78,7 +78,8 @@ stages:
     pool:
       name: default
       #vmImage: 'windows-latest'
-    steps:  
+    steps:
+    - checkout: none
     - task: DownloadPipelineArtifact@1
       inputs:
         artifactName: 'drop'
@@ -102,6 +103,7 @@ stages:
       name: Default
       #vmImage: 'windows-latest'
     steps:
+    - checkout: none
     - task: DownloadPipelineArtifact@1
       inputs:
         artifactName: 'vars'
@@ -230,6 +232,7 @@ stages:
       name: Default
       #vmImage: 'windows-latest'
     steps:
+    - checkout: none
     - task: DownloadPipelineArtifact@1
       inputs:
         artifactName: 'vars'
