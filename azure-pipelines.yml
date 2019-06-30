@@ -194,6 +194,7 @@ stages:
               packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
               nuGetFeedType: 'internal'
               publishVstsFeed: '/b4573900-0d0d-4915-b6b5-cfc2fee08f7d'
+              allowPackageConflicts: true
     condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), startswith(variables['Build.SourceBranch'], 'refs/heads/release/')) )
 
   - deployment: DeployPreviewNuget
@@ -328,7 +329,7 @@ stages:
               packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
               nuGetFeedType: 'external'
               publishFeedCredentials: 'Nuget.org'
-    condition: and(succeeded(), ne(variables['releaseSkip'], 'true'), ne(variables['Build.Reason'], 'PullRequest'), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), startswith(variables['Build.SourceBranch'], 'refs/heads/release/')) )
+    condition: and(succeeded(), ne(variables['releaseSkip'], 'true'), ne(variables['Build.Reason'], 'PullRequest'), or(eq(variables['Build.SourceBranch'], 'refs/heads/master')) )
 
           ## Task does not support API key yet.
           #- task: DotNetCoreCLI@2
