@@ -305,6 +305,7 @@ stages:
               packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
               nuGetFeedType: 'internal'
               publishVstsFeed: '/b4573900-0d0d-4915-b6b5-cfc2fee08f7d'
+              allowPackageConflicts: true
     condition: and(succeeded(), ne(variables['releaseSkip'], 'true'), ne(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranch'], 'refs/heads/master') )
 
   - deployment: DeployReleaseNuget
