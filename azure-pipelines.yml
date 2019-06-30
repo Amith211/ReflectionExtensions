@@ -20,8 +20,8 @@ stages:
   - job: build
     displayName: 'Run Build'
     pool:
-      Default
-      #vmImage: 'windows-latest'
+      #Default
+      vmImage: 'windows-latest'
     steps:
     - task: GitVersion@4
       inputs:
