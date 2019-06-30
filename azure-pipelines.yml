@@ -20,7 +20,7 @@ stages:
   - job: build
     displayName: 'Run Build'
     pool:
-      Default
+      name: Default
       #vmImage: 'windows-latest'
     steps:
     - task: GitVersion@4
@@ -55,14 +55,14 @@ stages:
     - task: variabledehydration@0
       inputs:
         prefixes: 'GITVERSION,BUILD'
-        #output: $(Build.SourcesDirectory)
-        output: '$(build.artifactstagingdirectory)'
+        #outpath: $(Build.SourcesDirectory)
+        outpath: '$(build.artifactstagingdirectory)/vars'
 
     - task: PublishPipelineArtifact@0
       displayName: 'Publish Artifact drop'
       inputs:
         artifactName: 'vars'
-        targetPath: '$(build.artifactstagingdirectory)'
+        targetPath: '$(build.artifactstagingdirectory)/vars'
 
     - task: PublishPipelineArtifact@0
       displayName: 'Publish Artifact drop'
@@ -76,9 +76,10 @@ stages:
   - job: test
     displayName: 'Run Tests'
     pool:
-      default
+      name: default
       #vmImage: 'windows-latest'
-    steps:  
+    steps:
+    - checkout: none
     - task: DownloadPipelineArtifact@1
       inputs:
         artifactName: 'drop'
@@ -99,9 +100,10 @@ stages:
   - job: NugetPackPreview
     displayName: 'Pack Nuget preview'
     pool:
-      Default
+      name: Default
       #vmImage: 'windows-latest'
     steps:
+    - checkout: none
     - task: DownloadPipelineArtifact@1
       inputs:
         artifactName: 'vars'
@@ -192,6 +194,7 @@ stages:
               packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
               nuGetFeedType: 'internal'
               publishVstsFeed: '/b4573900-0d0d-4915-b6b5-cfc2fee08f7d'
+              allowPackageConflicts: true
     condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), startswith(variables['Build.SourceBranch'], 'refs/heads/release/')) )
 
   - deployment: DeployPreviewNuget
@@ -217,6 +220,7 @@ stages:
               packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
               nuGetFeedType: 'external'
               publishFeedCredentials: 'Nuget.org'
+              allowPackageConflicts: true
     condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), startswith(variables['Build.SourceBranch'], 'refs/heads/release/')) )
 
 ## Stable Release ##
@@ -227,9 +231,10 @@ stages:
   - job: NugetPackRelease
     displayName: 'Pack Nuget Release'
     pool:
-      Default
+      name: Default
       #vmImage: 'windows-latest'
     steps:
+    - checkout: none
     - task: DownloadPipelineArtifact@1
       inputs:
         artifactName: 'vars'
@@ -300,7 +305,8 @@ stages:
               packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
               nuGetFeedType: 'internal'
               publishVstsFeed: '/b4573900-0d0d-4915-b6b5-cfc2fee08f7d'
-    condition: and(succeeded(), ne(variables['releaseSkip'], 'true'), ne(variables['Build.Reason'], 'PullRequest'), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), startswith(variables['Build.SourceBranch'], 'refs/heads/release/')) )
+              allowPackageConflicts: true
+    condition: and(succeeded(), ne(variables['releaseSkip'], 'true'), ne(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranch'], 'refs/heads/master') )
 
   - deployment: DeployReleaseNuget
     displayName: Deploy Release to Nuget.org
@@ -325,7 +331,8 @@ stages:
               packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
               nuGetFeedType: 'external'
               publishFeedCredentials: 'Nuget.org'
-    condition: and(succeeded(), ne(variables['releaseSkip'], 'true'), ne(variables['Build.Reason'], 'PullRequest'), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), startswith(variables['Build.SourceBranch'], 'refs/heads/release/')) )
+              allowPackageConflicts: true
+    condition: and(succeeded(), ne(variables['releaseSkip'], 'true'), ne(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranch'], 'refs/heads/master') )
 
           ## Task does not support API key yet.
           #- task: DotNetCoreCLI@2
