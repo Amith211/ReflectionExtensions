@@ -62,7 +62,7 @@ stages:
       displayName: 'Publish Artifact drop'
       inputs:
         artifactName: 'vars'
-        targetPath: '$(build.artifactstagingdirectory)/vars/**'
+        targetPath: '$(build.artifactstagingdirectory)/vars'
 
     - task: PublishPipelineArtifact@0
       displayName: 'Publish Artifact drop'
