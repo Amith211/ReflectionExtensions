@@ -19,4 +19,4 @@ echo "##vso[task.setvariable variable=nugetVersion]$ver"
 [Environment]::SetEnvironmentVariable("LC_NUGETVERSION", "$ver", "User")
 Write-Host "Var is $ver";
 Write-Host "Env is $env:LC_NUGETVERSION";
-Write-Host "vso is $(nugetVersion)";
+Write-Host "vso is $env:nugetVersion";
