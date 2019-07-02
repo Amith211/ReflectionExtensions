@@ -20,6 +20,7 @@ resources:
     - repository: templates
       type: github
       name: Amith211/azure-pipelines-templates
+      endpoint: Amith211
 
 stages:
 - template: stages/build.yml@templates
