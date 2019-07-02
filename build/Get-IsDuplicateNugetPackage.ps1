@@ -9,7 +9,7 @@ function Get-IsDuplicateNugetPackage {
     $releases = Get-Releases -Json $json;
     $versions = Get-Versions -Releases $releases;
 
-    $isDuplicate = $versions.Contains($Version.ToLower());
+    $isDuplicate = $versions -Contains $Version;
 
     $isDuplicate;
 }
