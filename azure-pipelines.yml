@@ -104,7 +104,7 @@ stages:
     - template: .net/steps/nuget-pack.yml@templates
       parameters:
         artifactName: 'nuget'
-        nugetPackageVersion: $[variables.nugetVersion]
+        nugetPackageVersion: $(nugetVersion)
 
   - template: .net/jobs/nuget-push-to-azureArtifacts.yml@templates
     parameters:
