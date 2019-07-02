@@ -28,7 +28,7 @@ stages:
     dotNetCoreInstallerVersion: '2.2.300'
     pool: $(pool)
     
-- template: stages/test.yml@templates
+- template: .net/stages/test.yml@templates
 
 ## Preview release ##
 
@@ -42,7 +42,7 @@ stages:
       #vmImage: 'windows-latest'
     steps:
     - checkout: none
-    - template: steps/load-variables.yml@templates
+    - template: .net/steps/load-variables.yml@templates
 
     - task: DownloadPipelineArtifact@1
       inputs:
@@ -50,11 +50,11 @@ stages:
         #targetPath: $(Build.ArtifactStagingDirectory)
         targetPath: '$(Build.SourcesDirectory)'
 
-    - template: steps/nuget-pack.yml@templates
+    - template: .net/steps/nuget-pack.yml@templates
       parameters:
         artifactName: 'nuget-preview'
 
-  - template: jobs/nuget-push-to-azureArtifacts.yml@templates
+  - template: .net/jobs/nuget-push-to-azureArtifacts.yml@templates
     parameters:
       jobName: 'DeployNugetPreviewAzureArtifacts'
       jobDisplayName: 'Deploy Preview to Azure Artifacts'
@@ -63,7 +63,7 @@ stages:
       publishVstsFeed: '/b4573900-0d0d-4915-b6b5-cfc2fee08f7d'
       allowPackageConflicts: true
 
-  - template: jobs/nuget-push-to-nuget.yaml@templates
+  - template: .net/jobs/nuget-push-to-nuget.yaml@templates
     parameters:
       jobName: 'DeployNugetPreview'
       jobDisplayName: 'Deploy to Nuget.org'
@@ -84,7 +84,7 @@ stages:
       #vmImage: 'windows-latest'
     steps:
     - checkout: none
-    - template: steps/load-variables.yml@templates
+    - template: .net/steps/load-variables.yml@templates
 
     - task: DownloadPipelineArtifact@1
       inputs:
@@ -92,11 +92,11 @@ stages:
         #targetPath: $(Build.ArtifactStagingDirectory)
         targetPath: '$(Build.SourcesDirectory)'
 
-    - template: steps/nuget-pack.yml@templates
+    - template: .net/steps/nuget-pack.yml@templates
       parameters:
         artifactName: 'nuget'
 
-  - template: jobs/nuget-push-to-azureArtifacts.yml@templates
+  - template: .net/jobs/nuget-push-to-azureArtifacts.yml@templates
     parameters:
       jobName: 'DeployNugetAzureArtifacts'
       jobDisplayName: 'Deploy to Azure Artifacts'
@@ -105,7 +105,7 @@ stages:
       publishVstsFeed: '/b4573900-0d0d-4915-b6b5-cfc2fee08f7d'
       allowPackageConflicts: true
 
-  - template: jobs/nuget-push-to-nuget.yaml@templates
+  - template: .net/jobs/nuget-push-to-nuget.yaml@templates
     parameters:
       jobName: 'DeployNuget'
       jobDisplayName: 'Deploy to Nuget.org'
