@@ -67,7 +67,7 @@ stages:
     parameters:
       jobName: 'DeployNugetPreview'
       jobDisplayName: 'Deploy to Nuget.org'
-      pool: $(pool)
+      pool: ${{ variables.pool }}
       artifactName: 'nuget-preview'
       publishFeedCredentials: 'Nuget.org'
       allowPackageConflicts: true
@@ -80,7 +80,7 @@ stages:
   - job: NugetPackRelease
     displayName: 'Pack Nuget Release'
     pool:
-      name: $(pool)
+      name: ${{ variables.pool }}
       #vmImage: 'windows-latest'
     steps:
     - checkout: none
@@ -100,7 +100,7 @@ stages:
     parameters:
       jobName: 'DeployNugetAzureArtifacts'
       jobDisplayName: 'Deploy to Azure Artifacts'
-      pool: $(pool)
+      pool: ${{ variables.pool }}
       artifactName: 'nuget'
       publishVstsFeed: '/b4573900-0d0d-4915-b6b5-cfc2fee08f7d'
       allowPackageConflicts: true
@@ -109,7 +109,7 @@ stages:
     parameters:
       jobName: 'DeployNuget'
       jobDisplayName: 'Deploy to Nuget.org'
-      pool: $(pool)
+      pool: ${{ variables.pool }}
       artifactName: 'nuget'
       publishFeedCredentials: 'Nuget.org'
       allowPackageConflicts: true
