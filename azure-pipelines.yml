@@ -51,9 +51,18 @@ stages:
         #targetPath: $(Build.ArtifactStagingDirectory)
         targetPath: '$(Build.SourcesDirectory)'
 
+    - task: Powershell@2
+      name: SetNugetSemVerVersion
+      displayName: SetNugetSemVerVersion
+      inputs:
+        targetType: inline
+        script: |
+            $(Build.SourcesDirectory)/build/Set-NugetSemVersion.ps1
+
     - template: .net/steps/nuget-pack.yml@templates
       parameters:
         artifactName: 'nuget-preview'
+        nugetPackageVersion: $(nugetVersion)
 
   - template: .net/jobs/nuget-push-to-azureArtifacts.yml@templates
     parameters:
