@@ -20,6 +20,7 @@ resources:
     - repository: templates
       type: github
       name: Amith211/azure-pipelines-templates
+      ref: refs/heads/hotfix/fix_variables
       endpoint: Amith211
 
 stages:
