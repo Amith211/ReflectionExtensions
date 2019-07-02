@@ -23,7 +23,7 @@ resources:
       endpoint: Amith211
 
 stages:
-- template: stages/build.yml@templates
+- template: .netnet/stages/build.yml@templates
   parameters:
     dotNetCoreInstallerVersion: '2.2.300'
     pool: $(pool)
