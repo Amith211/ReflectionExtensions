@@ -58,7 +58,7 @@ stages:
     parameters:
       jobName: 'DeployNugetPreviewAzureArtifacts'
       jobDisplayName: 'Deploy Preview to Azure Artifacts'
-      pool: $(pool)
+      pool: 'Default'
       artifactName: 'nuget-preview'
       publishVstsFeed: '/b4573900-0d0d-4915-b6b5-cfc2fee08f7d'
       allowPackageConflicts: true
