@@ -63,7 +63,7 @@ stages:
       publishVstsFeed: '/b4573900-0d0d-4915-b6b5-cfc2fee08f7d'
       allowPackageConflicts: true
 
-  - template: .net/jobs/nuget-push-to-nuget.yaml@templates
+  - template: .net/jobs/nuget-push-to-nuget.yml@templates
     parameters:
       jobName: 'DeployNugetPreview'
       jobDisplayName: 'Deploy to Nuget.org'
@@ -105,7 +105,7 @@ stages:
       publishVstsFeed: '/b4573900-0d0d-4915-b6b5-cfc2fee08f7d'
       allowPackageConflicts: true
 
-  - template: .net/jobs/nuget-push-to-nuget.yaml@templates
+  - template: .net/jobs/nuget-push-to-nuget.yml@templates
     parameters:
       jobName: 'DeployNuget'
       jobDisplayName: 'Deploy to Nuget.org'
