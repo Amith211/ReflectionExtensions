@@ -50,26 +50,26 @@ stages:
         targetPath: '$(Build.SourcesDirectory)'
 
     - template: steps/nuget-pack.yml@templates
+      parameters:
         artifactName: 'nuget-preview'
 
   - template: jobs/nuget-push-to-azureArtifacts.yml@templates
-        parameters:
-            jobName: 'DeployNugetPreviewAzureArtifacts'
-            jobDisplayName: 'Deploy Preview to Azure Artifacts'
-            pool: $(pool)
-            artifactName: 'nuget-preview'
-            publishVstsFeed: '/b4573900-0d0d-4915-b6b5-cfc2fee08f7d'
-            allowPackageConflicts: true
+    parameters:
+      jobName: 'DeployNugetPreviewAzureArtifacts'
+      jobDisplayName: 'Deploy Preview to Azure Artifacts'
+      pool: $(pool)
+      artifactName: 'nuget-preview'
+      publishVstsFeed: '/b4573900-0d0d-4915-b6b5-cfc2fee08f7d'
+      allowPackageConflicts: true
 
   - template: jobs/nuget-push-to-nuget.yaml@templates
-        parameters:
-            jobName: 'DeployNugetPreview'
-            jobDisplayName: 'Deploy to Nuget.org'
-            pool: $(pool)
-            artifactName: 'nuget-preview'
-            publishFeedCredentials: 'Nuget.org'
-            allowPackageConflicts: true
-
+    parameters:
+      jobName: 'DeployNugetPreview'
+      jobDisplayName: 'Deploy to Nuget.org'
+      pool: $(pool)
+      artifactName: 'nuget-preview'
+      publishFeedCredentials: 'Nuget.org'
+      allowPackageConflicts: true
 
 ## Stable Release ##
 
@@ -92,25 +92,26 @@ stages:
         targetPath: '$(Build.SourcesDirectory)'
 
     - template: steps/nuget-pack.yml@templates
+      parameters:
         artifactName: 'nuget'
 
   - template: jobs/nuget-push-to-azureArtifacts.yml@templates
-        parameters:
-            jobName: 'DeployNugetAzureArtifacts'
-            jobDisplayName: 'Deploy to Azure Artifacts'
-            pool: $(pool)
-            artifactName: 'nuget'
-            publishVstsFeed: '/b4573900-0d0d-4915-b6b5-cfc2fee08f7d'
-            allowPackageConflicts: true
+    parameters:
+      jobName: 'DeployNugetAzureArtifacts'
+      jobDisplayName: 'Deploy to Azure Artifacts'
+      pool: $(pool)
+      artifactName: 'nuget'
+      publishVstsFeed: '/b4573900-0d0d-4915-b6b5-cfc2fee08f7d'
+      allowPackageConflicts: true
 
   - template: jobs/nuget-push-to-nuget.yaml@templates
-        parameters:
-            jobName: 'DeployNuget'
-            jobDisplayName: 'Deploy to Nuget.org'
-            pool: $(pool)
-            artifactName: 'nuget'
-            publishFeedCredentials: 'Nuget.org'
-            allowPackageConflicts: true
+    parameters:
+      jobName: 'DeployNuget'
+      jobDisplayName: 'Deploy to Nuget.org'
+      pool: $(pool)
+      artifactName: 'nuget'
+      publishFeedCredentials: 'Nuget.org'
+      allowPackageConflicts: true
 
           ## Task does not support API key yet.
           #- task: DotNetCoreCLI@2
