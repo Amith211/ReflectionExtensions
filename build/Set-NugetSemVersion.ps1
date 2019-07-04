@@ -1,18 +1,42 @@
 function Get-NugetVersion {
+    [cmdletbinding(
+        DefaultParameterSetName='Default'
+    )]
     param (
-        [switch]$IsPreview,
-        [string]$PreReleaseTag = $null
+        [Parameter(ParameterSetName = "Preview", Mandatory = $true)]
+        [switch]
+        $IsPreview,
+
+        [Parameter(ParameterSetName = "Preview")]
+        [string]
+        $PreReleaseTag = $null,
+
+        [string]
+        $BranchName,
+
+        [string]
+        $Version
     )
-    $branchName = $env:BUILD_SOURCEBRANCHNAME;
-    $ver = "";
+    $branchName = if (!([string]::IsNullOrWhiteSpace($BranchName))) { $BranchName; } else { $env:BUILD_SOURCEBRANCHNAME; };
+    $version = if (!([string]::IsNullOrWhiteSpace($Version))) { $Version; };
+
+    Check-Params -ParamName "BranchName" -EnvVarName "BUILD_SOURCEBRANCHNAME"  -ParamOpt1 $branchName -ParamOpt2 $env:BUILD_SOURCEBRANCHNAME;
+    
+
+    $output = "";
 
     $preReleaseTag = Get-PrereleaseTag -PreReleaseTag $PreReleaseTag;
-    $baseVer = Get-BaseVersion -BranchName $branchName;
-    $ver = Get-FullVersion -BaseVersion $baseVer -BranchName $branchName -IsPreview $IsPreview -PreReleaseTag $preReleaseTag;
+    $baseVer = Get-BaseVersion -BranchName $branchName -Version $version;
 
-    echo "##vso[task.setvariable variable=nugetVersion]$ver"
-    [Environment]::SetEnvironmentVariable("LC_NUGETVERSION", "$ver", "User")
-    Write-Host "Var is $ver";
+    $output = if ($IsPreview) { Get-FullVersion -BaseVersion $baseVer -BranchName $branchName -IsPreview -PreReleaseTag $preReleaseTag }
+    else            { Get-FullVersion -BaseVersion $baseVer -BranchName $branchName }
+    #$params = @{ BaseVersion = $baseVer; BranchName = $branchName; IsPreview = $IsPreview; PreReleaseTag = $preReleaseTag }
+    #$output = Get-FullVersion @params;
+    #-BaseVersion $baseVer -BranchName $branchName -IsPreview $IsPreview -PreReleaseTag $preReleaseTag;
+
+    echo "##vso[task.setvariable variable=nugetVersion]$output"
+    [Environment]::SetEnvironmentVariable("LC_NUGETVERSION", "$output", "User")
+    Write-Host "Var is $output";
     Write-Host "Env is $env:LC_NUGETVERSION";
     Write-Host "vso is $env:nugetVersion";
 }
@@ -20,71 +44,114 @@ function Get-NugetVersion {
 function Get-FullVersion 
 {
     param (
-        [string]$BaseVersion,
-        [string]$BranchName,
-        [switch]$IsPreview,
-        [string]$PreReleaseTag = 'beta'
+        [Parameter(ParameterSetName = "Default", Mandatory = $true)]
+        [Parameter(ParameterSetName = "Preview", Mandatory = $true)]
+        [string]
+        $BaseVersion,
+
+        [Parameter(ParameterSetName = "Default", Mandatory = $true)]
+        [Parameter(ParameterSetName = "Preview", Mandatory = $true)]
+        [string]
+        $BranchName,
+
+        [Parameter(ParameterSetName = "Preview", Mandatory = $true)]
+        [switch]
+        $IsPreview,
+
+        [Parameter(ParameterSetName = "Preview", Mandatory = $true)]
+        [string]$PreReleaseTag
     )
-    $ver = $BaseVersion;
+    $output = $BaseVersion;
 
     if ($IsPreview) 
     {
         if ($BranchName -eq "master") 
         {
-            $ver += "-$PreReleaseTag";
+            $output += "-$PreReleaseTag";
         }
 
         if ($BranchName -like "azure-pipelines-test*") 
         {
-            $ver += "-$PreReleaseTag-ReleasePipelineTest";
+            $output += "-$PreReleaseTag-ReleasePipelineTest";
         }
     }
     else 
     {
       if ($BranchName -like "azure-pipelines-test*") 
       {
-          $ver += "-ReleasePipelineTest" 
+          $output += "-ReleasePipelineTest" 
       }  
     }
 
-    $ver;
+    $output;
 }
 
 function Get-AzurePipeliesTestVersion {
+    [cmdletbinding(
+        DefaultParameterSetName = "Default"
+    )]
     param (
-        [string]$BaseVersion,
-        [string]$BranchName,
-        [switch]$IsPreview,
+        # Parameter help description
+        [Parameter(ParameterSetName = "Default", Mandatory = $true)]
+        [Parameter(ParameterSetName = "Preview", Mandatory = $true)]
+        [string]
+        $BaseVersion,
+
+        [Parameter(ParameterSetName = "Default", Mandatory = $true)]
+        [Parameter(ParameterSetName = "Preview", Mandatory = $true)]
+        [string]
+        $BranchName,
+
+        [Parameter(ParameterSetName = "Preview", Mandatory = $true)]
+        [switch]
+        $IsPreview,
+
+        [Parameter(ParameterSetName = "Preview", Mandatory = $true)]
         [string]$PreReleaseTag
     )
+    $output = $BaseVersion;
+
     if ($IsPreview) 
     {
         if ($BranchName -like "azure-pipelines-test*" -and $IsPreview) 
         {
-            $ver += "-$PreReleaseTag-ReleasePipelineTest";
+            $output += "-$PreReleaseTag-ReleasePipelineTest";
         }
     }
     elseif ($BranchName -like "azure-pipelines-test*") 
     {
-        $ver += "-ReleasePipelineTest" 
+        $output += "-ReleasePipelineTest" 
     }
+
+    Write-Output $output;
 }
 
 function Get-BaseVersion {
     param (
-        [string]$BranchName
+        [Parameter(Mandatory = $true)]
+        [string]
+        $BranchName,
+
+        [string]$Version = $null
     )
-    $ver = "";
+    $output = $null;
+    [string]$output = if (!([string]::IsNullOrWhiteSpace($Version))) { $Version; };
 
     if ($BranchName -like "azure-pipelines-test*") 
     {
-        $ver = "$env:GITVERSION_MAJORMINORPATCH"
+        Check-Params -ParamName "Version" -ParamOpt1 $Version -ParamOpt2 $env:GITVERSION_MAJORMINORPATCH;
+        $output = "$env:GITVERSION_MAJORMINORPATCH"
         #-$PreReleaseTag-ReleasePipelineTest
     } 
-    else 
+    elseif ([string]::IsNullOrWhiteSpace($Version)) 
     {
-        $ver = $env:GITVERSION_NUGETVERSIONV2;
-    }     
+        Check-Params -ParamName "Version" -ParamOpt1 $Version -ParamOpt2 $env:GITVERSION_NUGETVERSIONV2;
+        $output = $env:GITVERSION_NUGETVERSIONV2;
+    }
+
+    Check-Params -ParamName "Version" -ParamOpt1 $Version;
+
+    Write-Output $output;
 }
 
 
@@ -93,11 +160,58 @@ function Get-PrereleaseTag {
         [string]$PreReleaseTag = $null
     )
 
-    if ($null -ne $env:GITVERSION_NUGETPRERELEASETAGV2 -or $env:GITVERSION_NUGETPRERELEASETAGV2 -ne "" ) 
-        {
-            $PreReleaseTag = $env:GITVERSION_NUGETPRERELEASETAGV2
-        }
-        if ($null -eq $PreReleaseTag) { $PreReleaseTag = "beta" }
+    if (!([string]::IsNullOrEmpty($PreReleaseTag))) { Write-Output $PreReleaseTag; break; }
 
-    $PreReleaseTag;
+
+    if ($null -eq $output -and ([string]::IsNullOrWhiteSpace($env:GITVERSION_NUGETPRERELEASETAGV2) `
+                                -or [string]::IsNullOrWhiteSpace($env:GITVERSION_NUGETPRERELEASETAGV2)))
+        {
+            $output = $env:GITVERSION_NUGETPRERELEASETAGV2;
+        }
+
+    if ([string]::IsNullOrEmpty($output)) { $output = "beta" }
+
+    Write-Output $output;
 }
+
+function Check-Params {
+    [cmdletbinding(
+        DefaultParameterSetName = "Single"
+    )]
+    param (
+        [Parameter(ParameterSetName = "Single", Mandatory = $true)]
+        [Parameter(ParameterSetName = "Double", Mandatory = $true)]
+        [string]
+        $ParamName,
+
+        [string]
+        $EnvVarName,
+
+        [Parameter(ParameterSetName = "Single", Mandatory = $true)]
+        [Parameter(ParameterSetName = "Double", Mandatory = $true)]
+        [AllowNull()]
+        $ParamOpt1,
+
+        [Parameter(ParameterSetName = "Double", Mandatory = $true)]
+        [AllowNull()]
+        $ParamOpt2
+    )
+
+    if (($null -eq $ParamOpt1 -or [string]::IsNullOrEmpty($ParamOpt1)) -and ($null -eq $ParamOpt2 -or [string]::IsNullOrEmpty($ParamOpt2)) ) 
+    {
+        if (![string]::IsNullOrWhiteSpace($EnvVarName))
+        {
+            throw "Value for ""$ParamName"" required either set it as a parameter or by the environment variable, ""$EnvVarName"".";
+        } else 
+        {
+            throw "Value for ""$ParamName"" required either set it as a parameter or by using appropriate environment variable(s).";
+        }
+    }
+
+    if ($null -eq $ParamOpt1 -or [string]::IsNullOrEmpty($ParamOpt1)) 
+    {
+        throw "$ParamOpt1 must not be supplied";
+    }
+}
+
+Get-NugetVersion -BranchName 'master'  -Version "0.0.1"
