@@ -214,4 +214,4 @@ function Check-Params {
     }
 }
 
-Get-NugetVersion -BranchName 'master'  -Version "0.0.1"
+#Get-NugetVersion -BranchName 'master'  -Version "0.0.1"
