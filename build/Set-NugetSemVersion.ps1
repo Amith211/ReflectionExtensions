@@ -149,7 +149,7 @@ function Get-BaseVersion {
         $output = $env:GITVERSION_NUGETVERSIONV2;
     }
 
-    Check-Params -ParamName "Version" -ParamOpt1 $Version;
+    Check-Params -ParamName "Version" -ParamOpt1 $Version -ParamOpt2 $output;
 
     Write-Output $output;
 }
@@ -210,7 +210,7 @@ function Check-Params {
 
     if ($null -eq $ParamOpt1 -or [string]::IsNullOrEmpty($ParamOpt1)) 
     {
-        throw "$ParamOpt1 must not be supplied";
+        throw "Value for ""$ParamName"" must be supplied";
     }
 }
 
