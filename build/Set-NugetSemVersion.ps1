@@ -149,7 +149,7 @@ function Get-BaseVersion {
         $output = $env:GITVERSION_NUGETVERSIONV2;
     }
 
-    #Check-Params -ParamName "Version" -ParamOpt1 $Version -ParamOpt2 $output;
+    Check-Params -ParamName "Version" -ParamOpt1 $Version -ParamOpt2 $output;
 
     Write-Output $output;
 }
@@ -197,20 +197,26 @@ function Check-Params {
         $ParamOpt2
     )
 
-    if (($null -eq $ParamOpt1 -or [string]::IsNullOrEmpty($ParamOpt1)) -and ($null -eq $ParamOpt2 -or [string]::IsNullOrEmpty($ParamOpt2)) ) 
+    if ($PSCmdlet.ParameterSetName -eq "Single") 
     {
-        if (![string]::IsNullOrWhiteSpace($EnvVarName))
+        if ($null -eq $ParamOpt1 -or [string]::IsNullOrEmpty($ParamOpt1)) 
         {
-            throw "Value for ""$ParamName"" required either set it as a parameter or by the environment variable, ""$EnvVarName"".";
-        } else 
-        {
-            throw "Value for ""$ParamName"" required either set it as a parameter or by using appropriate environment variable(s).";
-        }
+            throw "Value for ""$ParamName"" must be supplied";
+        }    
     }
 
-    if ($null -eq $ParamOpt1 -or [string]::IsNullOrEmpty($ParamOpt1)) 
-    {
-        throw "Value for ""$ParamName"" must be supplied";
+    if ($PSCmdlet.ParameterSetName -eq "Double") 
+    { 
+        if (($null -eq $ParamOpt1 -or [string]::IsNullOrEmpty($ParamOpt1)) -and ($null -eq $ParamOpt2 -or [string]::IsNullOrEmpty($ParamOpt2)) ) 
+        {
+            if (![string]::IsNullOrWhiteSpace($EnvVarName))
+            {
+                throw "Value for ""$ParamName"" required either set it as a parameter or by the environment variable, ""$EnvVarName"".";
+            } else 
+            {
+                throw "Value for ""$ParamName"" required either set it as a parameter or by using appropriate environment variable(s).";
+            }
+        }
     }
 }
 
