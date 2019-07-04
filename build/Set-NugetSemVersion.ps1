@@ -149,7 +149,7 @@ function Get-BaseVersion {
         $output = $env:GITVERSION_NUGETVERSIONV2;
     }
 
-    Check-Params -ParamName "Version" -ParamOpt1 $Version -ParamOpt2 $output;
+    #Check-Params -ParamName "Version" -ParamOpt1 $Version -ParamOpt2 $output;
 
     Write-Output $output;
 }
