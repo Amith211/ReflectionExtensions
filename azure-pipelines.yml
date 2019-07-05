@@ -134,6 +134,7 @@ stages:
       artifactName: 'nuget'
       publishFeedCredentials: 'Nuget.org'
       allowPackageConflicts: true
+      nugetPackageVersion: $(nugetVersion)
   condition: > 
         and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'), 
           or(eq(variables['Build.SourceBranch'], 'refs/heads/master'),
