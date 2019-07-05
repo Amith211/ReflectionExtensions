@@ -128,7 +128,7 @@ stages:
       allowPackageConflicts: true
 
   - template: .net/jobs/nuget-push-to-nuget.yml@templates
-    dependsOn: SetNugetSemVerVersion
+    dependsOn: 'SetNugetSemVerVersion'
     parameters:
       jobName: 'DeployNuget'
       jobDisplayName: 'Deploy to Nuget.org'
