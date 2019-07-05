@@ -118,7 +118,7 @@ stages:
         nugetPackageVersion: $(nugetVersion)
 
   - template: .net/jobs/nuget-push-to-azureArtifacts.yml@templates
-    dependsOn: 'SetNugetSemVerVersion'
+    #dependsOn: 'SetNugetSemVerVersion'
     parameters:
       jobName: 'DeployNugetAzureArtifacts'
       jobDisplayName: 'Deploy to Azure Artifacts'
