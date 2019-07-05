@@ -113,9 +113,11 @@ stages:
              Get-NugetVersion;
 
     - template: .net/steps/nuget-pack.yml@templates
+      dependsOn: SetNugetSemVerVersion
       parameters:
         artifactName: 'nuget'
-        nugetPackageVersion: $(nugetVersion)
+        nugetPackageVersion: $[ SetNugetSemVerVersion.outputs['SetNugetSemVerVersion.nugetVersion']]
+        #$(nugetVersion)
 
   - template: .net/jobs/nuget-push-to-azureArtifacts.yml@templates
     #dependsOn: 'SetNugetSemVerVersion'
