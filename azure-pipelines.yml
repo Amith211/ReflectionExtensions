@@ -137,7 +137,7 @@ stages:
       artifactName: 'nuget'
       publishFeedCredentials: 'Nuget.org'
       allowPackageConflicts: true
-      nugetPackageVersion: $[ DeployRelease.outputs['SetNugetSemVerVersion.nugetVersionOutput'] ]
+      nugetPackageVersion: $[ variables.nugetVersion ]
       #$(nugetVersion)
   condition: > 
         and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'), 
