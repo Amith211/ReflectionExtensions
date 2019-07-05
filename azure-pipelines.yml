@@ -113,11 +113,10 @@ stages:
              Get-NugetVersion;
 
     - template: .net/steps/nuget-pack.yml@templates
-      dependsOn: SetNugetSemVerVersion
+      #dependsOn: SetNugetSemVerVersion
       parameters:
         artifactName: 'nuget'
-        nugetPackageVersion: $[ SetNugetSemVerVersion.outputs['SetNugetSemVerVersion.nugetVersion']]
-        #$(nugetVersion)
+        nugetPackageVersion: $(nugetVersion)
 
   - template: .net/jobs/nuget-push-to-azureArtifacts.yml@templates
     #dependsOn: 'SetNugetSemVerVersion'
@@ -138,7 +137,8 @@ stages:
       artifactName: 'nuget'
       publishFeedCredentials: 'Nuget.org'
       allowPackageConflicts: true
-      nugetPackageVersion: $(nugetVersion)
+      nugetPackageVersion: $[ dependencies.DeployRelease.outputs['SetNugetSemVerVersion.nugetVersionOutput'] ]
+      #$(nugetVersion)
   condition: > 
         and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'), 
           or(eq(variables['Build.SourceBranch'], 'refs/heads/master'),

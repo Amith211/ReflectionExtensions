@@ -34,7 +34,8 @@ function Get-NugetVersion {
     #$output = Get-FullVersion @params;
     #-BaseVersion $baseVer -BranchName $branchName -IsPreview $IsPreview -PreReleaseTag $preReleaseTag;
 
-    echo "##vso[task.setvariable variable=nugetVersion;isOutput=true]$output"
+    echo "##vso[task.setvariable variable=nugetVersion]$output"
+    echo "##vso[task.setvariable variable=nugetVersionOutput;isOutput=true]$output"
     [Environment]::SetEnvironmentVariable("LC_NUGETVERSION", "$output", "User")
     Write-Host "Var is $output";
     Write-Host "Env is $env:LC_NUGETVERSION";
