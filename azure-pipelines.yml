@@ -129,8 +129,8 @@ stages:
 
   - template: .net/jobs/nuget-push-to-nuget.yml@templates
     dependsOn:
-    - SetNugetSemVerVersion
-    - 'DeployNugetAzureArtifacts'
+        - SetNugetSemVerVersion
+        - 'DeployNugetAzureArtifacts'
     parameters:
       jobName: 'DeployNuget'
       jobDisplayName: 'Deploy to Nuget.org'
