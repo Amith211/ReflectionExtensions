@@ -1,11 +1,27 @@
 
 function Get-IsDuplicateNugetPackage {
     param (
-        [string]$PackageId,
-        [string]$Version
+        [Parameter(Mandatory = $true)]
+        [string]
+        $PackageId,
+
+        [Parameter(Mandatory = $true)]
+        [string]
+        $Version,
+
+        [string]
+        $ApiKey
     )
     
-    $json = Get-PackageRootJson $PackageId.ToLower();
+    if((!([string]::IsNullOrWhiteSpace($ApiKey))))
+    {
+        $json = Get-PackageRootJson $PackageId -ApiKey $ApiKey;
+    }
+    else 
+    {
+        $json = Get-PackageRootJson $PackageId;
+    }
+
     $releases = Get-Releases -Json $json;
     $versions = Get-Versions -Releases $releases;
 
@@ -52,9 +68,24 @@ function Get-Releases {
 
 function Get-PackageRootJson {
     param (
-        [string]$PackageId
+        [Parameter(Mandatory = $true)]
+        [string]
+        $PackageId,
+
+        [string]
+        $ApiKey
     )
-    $json = (Invoke-WebRequest https://api.nuget.org/v3/registration3/lcattell.reflectionextensions/index.json -UseBasicParsing) | ConvertFrom-Json;
+
+    $packageId = $PackageId.ToLower();
+
+    if (!([string]::IsNullOrWhiteSpace($ApiKey))) 
+    {
+        $json = (Invoke-WebRequest https://api.nuget.org/v3/registration3/$packageId/index.json -UseBasicParsing -Headers -Headers @{"X-NuGet-ApiKey"="$ApiKey"}) | ConvertFrom-Json;
+    }
+    else
+    {
+        $json = (Invoke-WebRequest https://api.nuget.org/v3/registration3/$packageId/index.json -UseBasicParsing) | ConvertFrom-Json;
+    }
     
     $json;
 }
