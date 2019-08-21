@@ -20,7 +20,7 @@ resources:
     - repository: templates
       type: github
       name: Amith211/azure-pipelines-templates
-      ref: refs/heads/hotfix/fix_variables
+      ref: refs/heads/hotfix/fix_nuget
       endpoint: Amith211
 
 stages:
@@ -70,6 +70,7 @@ stages:
     parameters:
       jobName: 'DeployNugetPreviewAzureArtifacts'
       jobDisplayName: 'Deploy Preview to Azure Artifacts'
+      azureDevOpsOrg: 'Amith211'
       pool: ${{ variables.pool }}
       artifactName: 'nuget-preview'
       publishVstsFeed: '/b4573900-0d0d-4915-b6b5-cfc2fee08f7d'
@@ -126,6 +127,7 @@ stages:
     parameters:
       jobName: 'DeployNugetAzureArtifacts'
       jobDisplayName: 'Deploy to Azure Artifacts'
+      azureDevOpsOrg: 'Amith211'
       pool: ${{ variables.pool }}
       artifactName: 'nuget'
       publishVstsFeed: '/b4573900-0d0d-4915-b6b5-cfc2fee08f7d'
@@ -138,7 +140,7 @@ stages:
       jobDisplayName: 'Deploy to Nuget.org'
       pool: ${{ variables.pool }}
       artifactName: 'nuget'
-      publishFeedCredentials: 'Nuget.org'
+      nuGetServiceConnections: 'Nuget.org'
       allowPackageConflicts: true
       nugetPackageVersion: $(DeployRelease.SetNugetSemVerVersion.nugetVersionOutput)
       #$(nugetVersion)
