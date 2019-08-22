@@ -1,7 +1,5 @@
-# ASP.NET Core (.NET Framework)
-# Build and test ASP.NET Core projects targeting the full .NET Framework.
-# Add steps that publish symbols, save build artifacts, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+# .NET Core
+# Build and test NET Core projects.
 
 trigger:
 - master
@@ -48,7 +46,6 @@ stages:
     - task: DownloadPipelineArtifact@1
       inputs:
         artifactName: 'drop'
-        #targetPath: $(Build.ArtifactStagingDirectory)
         targetPath: '$(Build.SourcesDirectory)'
 
     - task: Powershell@2
@@ -64,7 +61,6 @@ stages:
       parameters:
         artifactName: 'nuget-preview'
         nugetPackageVersion: $(SetNugetSemVerVersion.nugetVersionOutput)
-        #$(nugetVersion)
 
   - template: .net/jobs/nuget-push-to-azureArtifacts.yml@templates
     parameters:
@@ -106,7 +102,6 @@ stages:
     - task: DownloadPipelineArtifact@1
       inputs:
         artifactName: 'drop'
-        #targetPath: $(Build.ArtifactStagingDirectory)
         targetPath: '$(Build.SourcesDirectory)'
 
     - task: Powershell@2
@@ -119,15 +114,11 @@ stages:
              Get-NugetVersion;
 
     - template: .net/steps/nuget-pack.yml@templates
-      #dependsOn: SetNugetSemVerVersion
       parameters:
         artifactName: 'nuget'
         nugetPackageVersion: $(SetNugetSemVerVersion.nugetVersionOutput)
-        #$(SetNugetSemVerVersion.nugetVersionOutput)
-        #$(nugetVersion)
 
   - template: .net/jobs/nuget-push-to-azureArtifacts.yml@templates
-    #dependsOn: 'SetNugetSemVerVersion'
     parameters:
       jobName: 'DeployNugetAzureArtifacts'
       jobDisplayName: 'Deploy to Azure Artifacts'
@@ -139,7 +130,6 @@ stages:
       environment: 'Release'
 
   - template: .net/jobs/nuget-push-to-nuget.yml@templates
-    #dependsOn: 'SetNugetSemVerVersion'
     parameters:
       jobName: 'DeployNuget'
       jobDisplayName: 'Deploy to Nuget.org'
@@ -149,20 +139,9 @@ stages:
       allowPackageConflicts: true
       nugetPackageVersion: $(DeployRelease.SetNugetSemVerVersion.nugetVersionOutput)
       environment: 'Release'
-      #$(nugetVersion)
   condition: > 
         and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'), 
           or(eq(variables['Build.SourceBranch'], 'refs/heads/master'),
             startswith(variables['Build.SourceBranch'], 'refs/heads/release/'),
             startswith(variables['Build.SourceBranch'], 'refs/heads/azure-pipelines-test')) )
 ##condition run only if master or release otherwise it is a prerelease allreay deployed in previous stage
-
-          ## Task does not support API key yet.
-          #- task: DotNetCoreCLI@2
-          #  displayName: Publish Preview to Nuget.org
-          #  inputs:
-          #    command: 'push'
-          #    packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
-          #    nuGetFeedType: 'internal'
-          #    publishVstsFeed: '/b4573900-0d0d-4915-b6b5-cfc2fee08f7d'
-          #  condition: and(succeeded(), , ne(variables['Build.Reason'], 'PullRequest'), contains(variables['pushPreview'], 'nuget.org'))
