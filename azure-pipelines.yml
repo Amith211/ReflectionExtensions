@@ -75,15 +75,19 @@ stages:
       artifactName: 'nuget-preview'
       publishVstsFeed: '/b4573900-0d0d-4915-b6b5-cfc2fee08f7d'
       allowPackageConflicts: true
+      environment: 'Preview'
 
+#   Use when YAML Gates are implemented 
 #  - template: .net/jobs/nuget-push-to-nuget.yml@templates
 #    parameters:
 #      jobName: 'DeployNugetPreview'
 #      jobDisplayName: 'Deploy to Nuget.org'
 #      pool: ${{ variables.pool }}
 #      artifactName: 'nuget-preview'
-#      publishFeedCredentials: 'Nuget.org'
+#      nuGetServiceConnections: 'Nuget.org'
 #      allowPackageConflicts: true
+#      nugetPackageVersion: $(DeployRelease.SetNugetSemVerVersion.nugetVersionOutput)
+#      environment: 'Release'
 
 ## Stable Release ##
 
@@ -132,6 +136,7 @@ stages:
       artifactName: 'nuget'
       publishVstsFeed: '/b4573900-0d0d-4915-b6b5-cfc2fee08f7d'
       allowPackageConflicts: true
+      environment: 'Release'
 
   - template: .net/jobs/nuget-push-to-nuget.yml@templates
     #dependsOn: 'SetNugetSemVerVersion'
@@ -143,6 +148,7 @@ stages:
       nuGetServiceConnections: 'Nuget.org'
       allowPackageConflicts: true
       nugetPackageVersion: $(DeployRelease.SetNugetSemVerVersion.nugetVersionOutput)
+      environment: 'Release'
       #$(nugetVersion)
   condition: > 
         and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'), 
