@@ -118,7 +118,7 @@ stages:
       #dependsOn: SetNugetSemVerVersion
       parameters:
         artifactName: 'nuget'
-        nugetPackageVersion: 0.0.1-p
+        nugetPackageVersion: $(SetNugetSemVerVersion.nugetVersionOutput)
         #$(SetNugetSemVerVersion.nugetVersionOutput)
         #$(nugetVersion)
 
