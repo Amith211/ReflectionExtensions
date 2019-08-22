@@ -73,17 +73,21 @@ stages:
       allowPackageConflicts: true
       environment: 'Preview'
 
-#   Use when YAML Gates are implemented 
-#  - template: .net/jobs/nuget-push-to-nuget.yml@templates
-#    parameters:
-#      jobName: 'DeployNugetPreview'
-#      jobDisplayName: 'Deploy to Nuget.org'
-#      pool: ${{ variables.pool }}
-#      artifactName: 'nuget-preview'
-#      nuGetServiceConnections: 'Nuget.org'
-#      allowPackageConflicts: true
-#      nugetPackageVersion: $(DeployRelease.SetNugetSemVerVersion.nugetVersionOutput)
-#      environment: 'Release'
+    #   Use when YAML Gates are implemented 
+    #  - template: .net/jobs/nuget-push-to-nuget.yml@templates
+    #    parameters:
+    #      jobName: 'DeployNugetPreview'
+    #      jobDisplayName: 'Deploy to Nuget.org'
+    #      pool: ${{ variables.pool }}
+    #      artifactName: 'nuget-preview'
+    #      nuGetServiceConnections: 'Nuget.org'
+    #      allowPackageConflicts: true
+    #      nugetPackageVersion: $(DeployRelease.SetNugetSemVerVersion.nugetVersionOutput)
+    #      environment: 'Release'
+  condition: >  
+    or(ne(variables['Build.Reason'], 'PullRequest'),
+      eq(startswith(variables['Build.SourceBranch'], 'refs/heads/azure-pipelines-test') )
+## condition - Don't run stage if pull request unless it's an azure-pipelines test branch'
 
 ## Stable Release ##
 
@@ -140,8 +144,8 @@ stages:
       nugetPackageVersion: $(DeployRelease.SetNugetSemVerVersion.nugetVersionOutput)
       environment: 'Release'
   condition: > 
-        and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'), 
-          or(eq(variables['Build.SourceBranch'], 'refs/heads/master'),
-            startswith(variables['Build.SourceBranch'], 'refs/heads/release/'),
-            startswith(variables['Build.SourceBranch'], 'refs/heads/azure-pipelines-test')) )
-##condition run only if master or release otherwise it is a prerelease allreay deployed in previous stage
+    and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'), 
+      or(eq(variables['Build.SourceBranch'], 'refs/heads/master'),
+        startswith(variables['Build.SourceBranch'], 'refs/heads/release/'),
+        startswith(variables['Build.SourceBranch'], 'refs/heads/azure-pipelines-test')) )
+ ##condition - run only if master or release otherwise it is a prerelease allreay deployed in previous stage
