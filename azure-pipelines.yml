@@ -1,7 +1,5 @@
-# ASP.NET Core (.NET Framework)
-# Build and test ASP.NET Core projects targeting the full .NET Framework.
-# Add steps that publish symbols, save build artifacts, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+# .NET Core
+# Build and test NET Core projects.
 
 trigger:
 - master
@@ -10,87 +8,26 @@ variables:
   solution: '**/*.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
+  pool: 'Default'
   pushPreview: 'internal;nuget.org'
   nugetVersion: ""
   releaseSkip: 'true'
 
+resources:
+  repositories:
+    - repository: templates
+      type: github
+      name: Amith211/azure-pipelines-templates
+      ref: refs/heads/master
+      endpoint: Amith211
+
 stages:
-- stage: build
-  jobs:
-  - job: build
-    displayName: 'Run Build'
-    pool:
-      name: Default
-      #vmImage: 'windows-latest'
-    steps:
-    - task: GitVersion@4
-      inputs:
-        preferBundledVersion: true
+- template: .net/stages/build.yml@templates
+  parameters:
+    dotNetCoreInstallerVersion: '2.2.300'
+    pool: $(pool)
     
-    ## Debug Task to Show variables
-    #- task: Powershell@2
-    #  inputs:
-    #    targetType: inline
-    #    script: gci env:*Git* | sort-object name;
-
-    - task: DotNetCoreInstaller@0
-      inputs:
-        version: '2.2.300'
-
-    #- task: NuGetToolInstaller@0 # Doesn't require exact Version live above task
-
-    - task: DotNetCoreCLI@2
-      displayName: 'Restore'
-    #  inputs:
-    #    command: 'restore'
-    #    #projects: '**/*.csproj'
-    #    feedsToUse: 'select'    
-
-    - task: DotNetCoreCLI@2
-      displayName: 'Build'
-      inputs:
-        command: 'build'
-        arguments: '--configuration $(BuildConfiguration)'
-
-    - task: variabledehydration@0
-      inputs:
-        prefixes: 'GITVERSION,BUILD'
-        #outpath: $(Build.SourcesDirectory)
-        outpath: '$(build.artifactstagingdirectory)/vars'
-
-    - task: PublishPipelineArtifact@0
-      displayName: 'Publish Artifact drop'
-      inputs:
-        artifactName: 'vars'
-        targetPath: '$(build.artifactstagingdirectory)/vars'
-
-    - task: PublishPipelineArtifact@0
-      displayName: 'Publish Artifact drop'
-      inputs:
-        artifactName: 'drop'
-        targetPath: '$(Build.SourcesDirectory)'
-        
-- stage: test
-  displayName: 'Test.'
-  jobs:
-  - job: test
-    displayName: 'Run Tests'
-    pool:
-      name: default
-      #vmImage: 'windows-latest'
-    steps:
-    - checkout: none
-    - task: DownloadPipelineArtifact@1
-      inputs:
-        artifactName: 'drop'
-
-    - task: DotNetCoreCLI@2
-      displayName: Test
-      inputs:
-        command: 'test'
-        projects: '**/*[Tt]ests/*.csproj'
-        arguments: '--logger trx --collect "Code coverage"'
-        nobuild: true
+- template: .net/stages/test.yml@templates
 
 ## Preview release ##
 
@@ -100,31 +37,16 @@ stages:
   - job: NugetPackPreview
     displayName: 'Pack Nuget preview'
     pool:
-      name: Default
+      name: $(pool)
       #vmImage: 'windows-latest'
     steps:
     - checkout: none
-    - task: DownloadPipelineArtifact@1
-      inputs:
-        artifactName: 'vars'
-        #targetPath: $(Build.ArtifactStagingDirectory)
-        targetPath: '$(Build.SourcesDirectory)'
-
-    - task: variablerehydration@0
-      inputs:
-        jsonfiles: '**/meta-*.json'
+    - template: .net/steps/load-variables.yml@templates
 
     - task: DownloadPipelineArtifact@1
       inputs:
         artifactName: 'drop'
-        #targetPath: $(Build.ArtifactStagingDirectory)
         targetPath: '$(Build.SourcesDirectory)'
-
-    - task: DotNetCoreCLI@2
-      displayName: Restore
-      inputs:
-        command: 'restore'
-        restoreSolution: '**/**/*.sln'
 
     - task: Powershell@2
       name: SetNugetSemVerVersion
@@ -132,115 +54,40 @@ stages:
       inputs:
         targetType: inline
         script: |
-            $ver = "";
-            $prereleaseTag = "beta";
-            if($env:Build_Reason -eq "PullRequest" )
-            {
-                $ver = "$env:GITVERSION_MAJORMINORPATCH-$prereleaseTag-$env:GITVERSION_PRERELEASENUMBER";
-            } 
-            elseif($env:BUILD_SOURCEBRANCHNAME -eq "master")
-            {
-                $ver = "$env:GitVersion_NuGetVersionV2-$prereleaseTag"
-            }
-            else 
-            {
-                $ver = "$env:GitVersion_NuGetVersionV2-$prereleaseTag-$env:GITVERSION_PRERELEASENUMBER";
-            }
-            echo "##vso[task.setvariable variable=nugetVersion]$ver"
-            [Environment]::SetEnvironmentVariable("LC_NUGETVERSION", "$ver", "User")
-            Write-Host "Var is $ver";
-            Write-Host "Env is $env:LC_NUGETVERSION";
-            Write-Host "vso is $(nugetVersion)";
+            . $(Build.SourcesDirectory)/build/Set-NugetSemVersion.ps1
+             Get-NugetVersion -IsPreview;
 
-    - task: DotNetCoreCLI@2
-      displayName: Pack
-      inputs:
-        command: 'pack'
-        nobuild: true
-        versioningScheme: 'byEnvVar'
-        versionEnvVar: nugetVersion
-        configuration: $(BuildConfiguration)
-        packageFolder: $(Build.ArtifactStagingDirectory)/package
-        arguments: '--no-build --no-restore'
-
-    - task: CopyFiles@2
-      inputs:
-        SourceFolder: '$(Build.ArtifactStagingDirectory)'
-        Contents: '**/*.nupkg'
-        TargetFolder: '$(Build.ArtifactStagingDirectory)/Package'
-      #condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
-
-    - task: PublishPipelineArtifact@0
-      displayName: 'Publish Artifact drop'
-      inputs:
+    - template: .net/steps/nuget-pack.yml@templates
+      parameters:
         artifactName: 'nuget-preview'
-        targetPath: $(Build.ArtifactStagingDirectory)/package
-      #condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))    
+        nugetPackageVersion: $(SetNugetSemVerVersion.nugetVersionOutput)
 
-  - deployment: DeployPreviewAzure
-    displayName: Deploy Preview to Azure Artifacts
-    pool:
-       name: Default
-    variables:
-        nugetVersion: "t"
-    environment: PreviewAzure
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - task: DownloadPipelineArtifact@1
-            inputs:
-              artifactName: 'nuget-preview'
-              targetPath: $(Build.ArtifactStagingDirectory)
+  - template: .net/jobs/nuget-push-to-azureArtifacts.yml@templates
+    parameters:
+      jobName: 'DeployNugetPreviewAzureArtifacts'
+      jobDisplayName: 'Deploy Preview to Azure Artifacts'
+      azureDevOpsOrg: 'Amith211'
+      pool: ${{ variables.pool }}
+      artifactName: 'nuget-preview'
+      publishVstsFeed: '/b4573900-0d0d-4915-b6b5-cfc2fee08f7d'
+      allowPackageConflicts: true
+      environment: 'Preview'
 
-          - task: NuGetCommand@2
-            displayName: Publish Preview to Artifacts
-            inputs:
-              command: 'push'
-              packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
-              nuGetFeedType: 'internal'
-              publishVstsFeed: '/b4573900-0d0d-4915-b6b5-cfc2fee08f7d'
-              allowPackageConflicts: true
-    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), startswith(variables['Build.SourceBranch'], 'refs/heads/release/')) )
-
-  - deployment: DeployPreviewNuget
-    displayName: Deploy Preview to Nuget.org
-    pool:
-       name: Default
-    variables:
-        nugetVersion: "t"
-    environment: PreviewNuget
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - task: DownloadPipelineArtifact@1
-            inputs:
-              artifactName: 'nuget-preview'
-              targetPath: $(Build.ArtifactStagingDirectory)
-
-          - task: Powershell@2
-            name: SetNugetDuplicateVar
-            displayName: SetNugetSemVerVersion
-            inputs:
-              targetType: inline
-              script: |
-                 . $(Build.SourcesDirectory)/build/Get-IsDuplicateNugetPackage.ps1
-                  
-                  $isDuplicate = Get-IsDuplicateNugetPackage -PackageId "LCattell.ReflectionExtensions" -Version "$env:GitVersion_NuGetVersionV2";
-                   
-                  echo "##vso[task.setvariable variable=isDuplicate]$isDuplicate";
-
-          - task: NuGetCommand@2
-            displayName: Publish Preview to Nuget.org
-            inputs:
-              command: 'push'
-              packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
-              nuGetFeedType: 'external'
-              publishFeedCredentials: 'Nuget.org'
-              allowPackageConflicts: true
-          condition: ne(variables['isDuplicate'], 'true')
-    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), startswith(variables['Build.SourceBranch'], 'refs/heads/release/')) )
+    #   Use when YAML Gates are implemented 
+    #  - template: .net/jobs/nuget-push-to-nuget.yml@templates
+    #    parameters:
+    #      jobName: 'DeployNugetPreview'
+    #      jobDisplayName: 'Deploy to Nuget.org'
+    #      pool: ${{ variables.pool }}
+    #      artifactName: 'nuget-preview'
+    #      nuGetServiceConnections: 'Nuget.org'
+    #      allowPackageConflicts: true
+    #      nugetPackageVersion: $(DeployRelease.SetNugetSemVerVersion.nugetVersionOutput)
+    #      environment: 'Release'
+  condition: >  
+    or(ne(variables['Build.Reason'], 'PullRequest'),
+        startswith(variables['Build.SourceBranch'], 'refs/heads/azure-pipelines-test') )
+## condition - Don't run stage if pull request unless it's an azure-pipelines test branch'
 
 ## Stable Release ##
 
@@ -250,128 +97,55 @@ stages:
   - job: NugetPackRelease
     displayName: 'Pack Nuget Release'
     pool:
-      name: Default
+      name: ${{ variables.pool }}
       #vmImage: 'windows-latest'
     steps:
     - checkout: none
-    - task: DownloadPipelineArtifact@1
-      inputs:
-        artifactName: 'vars'
-        #targetPath: $(Build.ArtifactStagingDirectory)
-        targetPath: '$(Build.SourcesDirectory)'
-
-    - task: variablerehydration@0
-      inputs:
-        jsonfiles: '**/meta-*.json'
+    - template: .net/steps/load-variables.yml@templates
 
     - task: DownloadPipelineArtifact@1
       inputs:
         artifactName: 'drop'
-        #targetPath: $(Build.ArtifactStagingDirectory)
         targetPath: '$(Build.SourcesDirectory)'
 
-    - task: DotNetCoreCLI@2
-      displayName: Restore
+    - task: Powershell@2
+      name: SetNugetSemVerVersion
+      displayName: SetNugetSemVerVersion
       inputs:
-        command: 'restore'
-        restoreSolution: '**/**/*.sln'
+        targetType: inline
+        script: |
+            . $(Build.SourcesDirectory)/build/Set-NugetSemVersion.ps1
+             Get-NugetVersion;
 
-    - task: DotNetCoreCLI@2
-      displayName: Pack
-      inputs:
-        command: 'pack'
-        nobuild: true
-        versioningScheme: 'byEnvVar'
-        versionEnvVar: GitVersion_NuGetVersionV2
-        configuration: $(BuildConfiguration)
-        packageFolder: $(Build.ArtifactStagingDirectory)/package
-        arguments: '--no-build --no-restore'
+    - template: .net/steps/nuget-pack.yml@templates
+      parameters:
+        artifactName: 'nuget'
+        nugetPackageVersion: $(SetNugetSemVerVersion.nugetVersionOutput)
 
-    - task: CopyFiles@2
-      inputs:
-        SourceFolder: '$(Build.ArtifactStagingDirectory)'
-        Contents: '**/*.nupkg'
-        TargetFolder: '$(Build.ArtifactStagingDirectory)/Package'
-      #condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+  - template: .net/jobs/nuget-push-to-azureArtifacts.yml@templates
+    parameters:
+      jobName: 'DeployNugetAzureArtifacts'
+      jobDisplayName: 'Deploy to Azure Artifacts'
+      azureDevOpsOrg: 'Amith211'
+      pool: ${{ variables.pool }}
+      artifactName: 'nuget'
+      publishVstsFeed: '/b4573900-0d0d-4915-b6b5-cfc2fee08f7d'
+      allowPackageConflicts: true
+      environment: 'Release'
 
-    - task: PublishPipelineArtifact@0
-      displayName: 'Publish Artifact drop'
-      inputs:
-        artifactName: 'nuget-release'
-        targetPath: $(Build.ArtifactStagingDirectory)/package
-      #condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))    
-
-  - deployment: DeployReleaseAzure
-    displayName: Deploy Release to Azure Artifacts
-    pool:
-       name: Default
-    variables:
-        nugetVersion: "t"
-    environment: ReleaseAzure
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - task: DownloadPipelineArtifact@1
-            inputs:
-              artifactName: 'nuget-release'
-              targetPath: $(Build.ArtifactStagingDirectory)
-
-          - task: NuGetCommand@2
-            displayName: Publish Preview to Artifacts
-            inputs:
-              command: 'push'
-              packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
-              nuGetFeedType: 'internal'
-              publishVstsFeed: '/b4573900-0d0d-4915-b6b5-cfc2fee08f7d'
-              allowPackageConflicts: true
-    condition: and(succeeded(), ne(variables['releaseSkip'], 'true'), ne(variables['Build.Reason'], 'PullRequest'), ne(variables['$isDuplicate'], 'true'), eq(variables['Build.SourceBranch'], 'refs/heads/master') )
-
-  - deployment: DeployReleaseNuget
-    displayName: Deploy Release to Nuget.org
-    pool:
-       name: Default
-    variables:
-        nugetVersion: "t"
-    environment: ReleaseNuget
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - task: DownloadPipelineArtifact@1
-            inputs:
-              artifactName: 'nuget-release'
-              targetPath: $(Build.ArtifactStagingDirectory)
-
-          - task: Powershell@2
-            name: SetNugetDuplicateVar
-            displayName: SetNugetSemVerVersion
-            inputs:
-              targetType: inline
-              script: |
-                 . $(Build.SourcesDirectory)/build/Get-IsDuplicateNugetPackage.ps1
-                  
-                  $isDuplicate = Get-IsDuplicateNugetPackage -PackageId "LCattell.ReflectionExtensions" -Version "$nv:GitVersion_NuGetVersionV2";
-                   
-                  echo "##vso[task.setvariable variable=isDuplicate]$isDuplicate";
-
-          - task: NuGetCommand@2
-            displayName: Publish Release to Nuget.org
-            inputs:
-              command: 'push'
-              packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
-              nuGetFeedType: 'external'
-              publishFeedCredentials: 'Nuget.org'
-              allowPackageConflicts: true
-          condition: ne(variables['isDuplicate'], 'true')
-    condition: and(succeeded(), ne(variables['releaseSkip'], 'true'), ne(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranch'], 'refs/heads/master') )
-
-          ## Task does not support API key yet.
-          #- task: DotNetCoreCLI@2
-          #  displayName: Publish Preview to Nuget.org
-          #  inputs:
-          #    command: 'push'
-          #    packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
-          #    nuGetFeedType: 'internal'
-          #    publishVstsFeed: '/b4573900-0d0d-4915-b6b5-cfc2fee08f7d'
-          #  condition: and(succeeded(), , ne(variables['Build.Reason'], 'PullRequest'), contains(variables['pushPreview'], 'nuget.org'))
+  - template: .net/jobs/nuget-push-to-nuget.yml@templates
+    parameters:
+      jobName: 'DeployNuget'
+      jobDisplayName: 'Deploy to Nuget.org'
+      pool: ${{ variables.pool }}
+      artifactName: 'nuget'
+      nuGetServiceConnections: 'Nuget.org'
+      allowPackageConflicts: true
+      nugetPackageVersion: $(DeployRelease.SetNugetSemVerVersion.nugetVersionOutput)
+      environment: 'Release'
+  condition: > 
+    and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'), 
+      or(eq(variables['Build.SourceBranch'], 'refs/heads/master'),
+        startswith(variables['Build.SourceBranch'], 'refs/heads/release/'),
+        startswith(variables['Build.SourceBranch'], 'refs/heads/azure-pipelines-test')) )
+ ##condition - run only if master or release otherwise it is a prerelease allreay deployed in previous stage
