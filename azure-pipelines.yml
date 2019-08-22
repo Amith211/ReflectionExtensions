@@ -86,7 +86,7 @@ stages:
     #      environment: 'Release'
   condition: >  
     or(ne(variables['Build.Reason'], 'PullRequest'),
-      eq(startswith(variables['Build.SourceBranch'], 'refs/heads/azure-pipelines-test') )
+      eq(startswith(variables['Build.SourceBranch'], 'refs/heads/azure-pipelines-test')) )
 ## condition - Don't run stage if pull request unless it's an azure-pipelines test branch'
 
 ## Stable Release ##
