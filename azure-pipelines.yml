@@ -70,6 +70,7 @@ stages:
       pool: ${{ variables.pool }}
       artifactName: 'nuget-preview'
       publishDevOpsFeed: '/b4573900-0d0d-4915-b6b5-cfc2fee08f7d'
+      islegacyDevOpsUrl: true
       allowPackageConflicts: true
       environment: 'Preview'
 
@@ -130,6 +131,7 @@ stages:
       pool: ${{ variables.pool }}
       artifactName: 'nuget'
       publishDevOpsFeed: '/b4573900-0d0d-4915-b6b5-cfc2fee08f7d'
+      islegacyDevOpsUrl: true
       allowPackageConflicts: true
       environment: 'Release'
 
