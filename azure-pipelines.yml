@@ -69,7 +69,8 @@ stages:
       azureDevOpsOrg: 'Amith211'
       pool: ${{ variables.pool }}
       artifactName: 'nuget-preview'
-      publishVstsFeed: '/b4573900-0d0d-4915-b6b5-cfc2fee08f7d'
+      publishDevOpsFeed: '/b4573900-0d0d-4915-b6b5-cfc2fee08f7d'
+      islegacyDevOpsUrl: true
       allowPackageConflicts: true
       environment: 'Preview'
 
@@ -129,7 +130,8 @@ stages:
       azureDevOpsOrg: 'Amith211'
       pool: ${{ variables.pool }}
       artifactName: 'nuget'
-      publishVstsFeed: '/b4573900-0d0d-4915-b6b5-cfc2fee08f7d'
+      publishDevOpsFeed: '/b4573900-0d0d-4915-b6b5-cfc2fee08f7d'
+      islegacyDevOpsUrl: true
       allowPackageConflicts: true
       environment: 'Release'
 
