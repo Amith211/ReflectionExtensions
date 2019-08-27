@@ -18,7 +18,7 @@ resources:
     - repository: templates
       type: github
       name: Amith211/azure-pipelines-templates
-      ref: refs/heads/master
+      ref: refs/heads/feature_add_nuget_step
       endpoint: Amith211
 
 stages:
